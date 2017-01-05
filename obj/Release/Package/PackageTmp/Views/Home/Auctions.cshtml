@@ -1,0 +1,21 @@
+﻿@model dynamic
+
+@{
+    ViewBag.Title = "Auctions";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<body>
+    <h2 class="text-center">Live Auctions Bidding</h2>
+    <div id="auctionsTable" class="container">
+        <div class="row-fluid">
+        </div>
+    </div>
+</body>
+
+@section Scripts {
+    @Scripts.Render("~/Scripts/jquery-1.10.2.min.js");
+    @Scripts.Render("~/Scripts/jquery.signalR-2.1.2.min.js");
+    @Scripts.Render("~/signalr/hubs");
+    @Scripts.Render("~/Scripts/Custom/auctions.js");
+}
