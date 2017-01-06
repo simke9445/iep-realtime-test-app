@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.EntityFramework;
 using RealtimeTestApp.Hubs;
 using RealtimeTestApp.Models;
 
@@ -10,6 +12,16 @@ namespace RealtimeTestApp.Controllers
 {
     public class HomeController : Controller
     {
+        protected ApplicationDbContext ApplicationDbContext { get; set; }
+        protected UserManager<ApplicationUser> UserManager { get; set; }
+
+        public HomeController()
+        {
+            ApplicationDbContext = new ApplicationDbContext();
+            UserManager =
+                new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(ApplicationDbContext));
+        }
+
         public ActionResult Index()
         {
             return View();
@@ -45,15 +57,13 @@ namespace RealtimeTestApp.Controllers
 
         public ActionResult NewAuctionForm()
         {
-
             return View();
         }
 
         [HttpPost]
-        public ActionResult ExtendAuction(string name)
+        public ActionResult ExtendAuction(long id)
         {
-            Console.WriteLine("ExtendAuction " + name);
-            AuctionTicker.Instance.ExtendAuction(name);
+            AuctionTicker.Instance.ExtendAuction(id, UserManager.FindById(User.Identity.GetUserId()), ApplicationDbContext);
             
             return Json(new {status="Success", message="Success"});
         }

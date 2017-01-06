@@ -1,4 +1,5 @@
-﻿using System.Data.Entity;
+﻿using System;
+using System.Data.Entity;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
@@ -16,10 +17,20 @@ namespace RealtimeTestApp.Models
             // Add custom user claims here
             return userIdentity;
         }
+
+        public String FirstName { get; set; }
+        public String LastName { get; set; }
+        public int TokenStashSize { get; set; }
+           
     }
 
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
+        // here you place all the necessary DbSet<?> repositories
+        public DbSet<Auction> Auctions { get; set; }
+        public DbSet<Bid> Bids { get; set; }
+        public DbSet<Order> Orders { get; set; }
+
         public ApplicationDbContext()
             : base("DefaultConnection", throwIfV1Schema: false)
         {
