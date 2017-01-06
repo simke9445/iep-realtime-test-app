@@ -26,7 +26,17 @@
     <div class="form-group">
         @Html.LabelFor(m => m.Image)
         @Html.TextBoxFor(m => m.Image, new { @class = "form-control" })
+        <input type="file" id="file" accept="image/*">
     </div>
 
     <button class="btn btn-primary" type="submit"> Submit </button>
 }
+
+
+@Scripts.Render("~/Scripts/jquery-3.1.1.min.js");
+<script>
+    $("input#file")
+        .on('change', function() {
+            $("input#Image").text("/Content/Images/" + $("input#file").prop("files")['name']);
+        });
+</script>

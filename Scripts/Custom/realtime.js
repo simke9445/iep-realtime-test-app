@@ -45,7 +45,7 @@ $(function() {
                             '<div class="panel-body text-center">' +
                                 '<img src={Image} class="img-responsive img-rounded" />' + 
                                 '<p class="time"> {Time} </p>' +
-                                '<p>{LastBidUser.UserName}</p>' +
+                                '<p class="last-bid-user"></p>' +
                             '</div>' +
                             '<div class="panel-footing text-center"> ' +
                                 '<btn class="btn btn-primary extend">Extend</btn>' +
@@ -93,7 +93,9 @@ $(function() {
         });
 
         if (currentAuction != null) {
-            currentAuction.auction.Time += extendPeriod;
+            console.log(extendedAuction);
+            currentAuction.auction = extendedAuction;
+            currentAuction.dom.find(".last-bid-user").html(currentAuction.auction.LastBidUser.UserName);
             currentAuction.dom.find(".time").html(currentAuction.auction.Time);
         }
     };

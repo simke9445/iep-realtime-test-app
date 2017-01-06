@@ -6,6 +6,7 @@ using System.Threading;
 using System.Web;
 using System.Web.Helpers;
 using System.Web.Mvc;
+using System.Web.UI.WebControls;
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Hubs;
 using RealtimeTestApp.Models;
@@ -17,7 +18,6 @@ namespace RealtimeTestApp.Hubs
     {
         private readonly Timer _timer;
         private static readonly Lazy<AuctionTicker> _instance = new Lazy<AuctionTicker>(() => new AuctionTicker(GlobalHost.ConnectionManager.GetHubContext<AuctionHub>().Clients));
-        private readonly ConcurrentDictionary<long, Auction> _auctions = new ConcurrentDictionary<long, Auction>();
         private readonly TimeSpan _updateInterval = TimeSpan.FromSeconds(1);
         private static readonly object Lock = new object();
         private static readonly int ExtendPeriod = 10;
@@ -29,23 +29,6 @@ namespace RealtimeTestApp.Hubs
         {
             Clients = clients;
 
-            _auctions.Clear();
-
-            using (var context = new ApplicationDbContext())
-            {
-                context.Auctions.ToList().AsParallel().ForEach(item =>
-                {
-                    if (item.State == AuctionState.Ready)
-                    {
-                        _auctions.TryAdd(item.Id, item);
-                    }
-                });
-            }
-
-            /*_auctions.TryAdd(1, new Auction() { Id = 1, Time = 1000, ProductName = "1"});
-            _auctions.TryAdd(2, new Auction() { Id = 2, Time = 100, ProductName = "2"});
-            _auctions.TryAdd(3, new Auction() { Id = 3, Time = 10, ProductName = "3"});*/
-
             _timer = new Timer(Tick, null, _updateInterval, _updateInterval);
         }
 
@@ -53,17 +36,20 @@ namespace RealtimeTestApp.Hubs
         {
             lock (Lock)
             {
-                _auctions.AsParallel().ForEach(item =>
+                using (var context = new ApplicationDbContext())
                 {
+                     context.Auctions.Where(item => item.State == AuctionState.Ready).AsParallel().ForEach(item =>
+                      {
+                          item.Time--;
+                          if (item.Time == 0)
+                          {
+                              RemoveAuction(item);
+                          }
+                      });
 
-                    item.Value.Time--;
-                    if (item.Value.Time == 0)
-                    {
-                        RemoveAuction(item.Value);
-                    }
-                });
-
-                Clients.All.tick();
+                    context.SaveChanges();
+                    Clients.All.tick();
+                }
             }
         }
 
@@ -71,19 +57,16 @@ namespace RealtimeTestApp.Hubs
         {
             lock (Lock)
             {
-                if (_auctions.TryAdd(auction.Id, auction))
-                {
-                    using (var context = new ApplicationDbContext())
-                    {   
-                        auction.State = AuctionState.Ready;
-                        auction.CreationDateTime = DateTime.Now;
-                        auction.OpeningDateTime = DateTime.Now;
-                        context.Auctions.Add(auction);
-                        context.SaveChanges();
-                    }
-
-                    Clients.All.newAuction(auction);
+                using (var context = new ApplicationDbContext())
+                {   
+                    auction.State = AuctionState.Ready;
+                    auction.CreationDateTime = DateTime.Now;
+                    auction.OpeningDateTime = DateTime.Now;
+                    context.Auctions.Add(auction);
+                    context.SaveChanges();
                 }
+
+                Clients.All.newAuction(auction);
             }
             
         }
@@ -92,15 +75,17 @@ namespace RealtimeTestApp.Hubs
         {
             lock (Lock)
             {
-                Auction auction = _auctions.Values.FirstOrDefault(item => item.Id == id);
+                Auction auction = context.Auctions.FirstOrDefault(item => item.Id == id);
                 if (auction != null)
                 {
                     auction.LastBidUser = user;
                     auction.Time += ExtendPeriod;
-                    Bid bid = new Bid();
-                    bid.User = user;
-                    bid.Auction = auction;
-                    bid.CreationDateTime = DateTime.Now;
+                    Bid bid = new Bid
+                    {
+                        User = user,
+                        Auction = auction,
+                        CreationDateTime = DateTime.Now
+                    };
 
                     context.Bids.Add(bid);
                     context.SaveChanges();
@@ -114,23 +99,23 @@ namespace RealtimeTestApp.Hubs
 
         public void RemoveAuction(Auction auction)
         {
-            Auction placeholderAuction;
-            if (_auctions.TryRemove(auction.Id, out placeholderAuction))
+            using (var context = new ApplicationDbContext())
             {
-                using (var context = new ApplicationDbContext())
-                {
-                    auction = context.Auctions.First(item => item.Id == auction.Id);
-                    auction.State = AuctionState.Expired;
-                    auction.ClosingDateTime = DateTime.Now;
-                    context.SaveChanges();
-                }
-                Clients.All.removeAuction(auction);
+                auction = context.Auctions.First(item => item.Id == auction.Id);
+                auction.State = AuctionState.Expired;
+                auction.ClosingDateTime = DateTime.Now;
+                context.SaveChanges();
             }
+
+            Clients.All.removeAuction(auction);
         }
 
         public IEnumerable<Auction> GetAllAuctions()
         {
-            return _auctions.Values;
+            using (var context = new ApplicationDbContext())
+            {
+                return context.Auctions.Where(item => item.State == AuctionState.Ready).OrderBy(item => item.Time).ToList();
+            }
         }
     }
 }
