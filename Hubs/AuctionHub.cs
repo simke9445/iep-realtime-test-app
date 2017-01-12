@@ -29,5 +29,10 @@ namespace RealtimeTestApp.Hubs
             return _auctionTicker.GetAllAuctions();
         }
 
+        public IEnumerable<Bid> GetAllBids(long auctionId)
+        {
+            return _auctionTicker.GetAllBids(auctionId);
+        }
+
     }
 }

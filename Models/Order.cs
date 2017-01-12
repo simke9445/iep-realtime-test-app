@@ -12,10 +12,17 @@ namespace RealtimeTestApp.Models
         Confirmed
     }
 
+    public enum TokenPackage
+    {
+        Silver = 3,
+        Gold = 5,
+        Platinum = 10
+    }
+
     public class Order
     {
         public long Id { get; set; }
-        public int TokenAmount { get; set; }
+        public TokenPackage TokenAmount { get; set; }
         public int PackagePrice { get; set; }
         public DateTime? CreationDateTime { get; set; }
         public OrderState State { get; set; }

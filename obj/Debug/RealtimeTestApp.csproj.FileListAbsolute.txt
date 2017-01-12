@@ -87,7 +87,5 @@ C:\Users\Djordje\Documents\Visual Studio 2015\Projects\RealtimeTestApp\RealtimeT
 C:\Users\Djordje\Documents\Visual Studio 2015\Projects\RealtimeTestApp\RealtimeTestApp\bin\roslyn\vbc.rsp
 C:\Users\Djordje\Documents\Visual Studio 2015\Projects\RealtimeTestApp\RealtimeTestApp\bin\log4net.dll
 C:\Users\Djordje\Documents\Visual Studio 2015\Projects\RealtimeTestApp\RealtimeTestApp\bin\log4net.xml
-C:\Users\Djordje\documents\visual studio 2015\Projects\RealtimeTestApp\RealtimeTestApp\obj\Debug\RealtimeTestApp.Migrations.InitialModels.resources
+C:\Users\Djordje\documents\visual studio 2015\Projects\RealtimeTestApp\RealtimeTestApp\obj\Debug\RealtimeTestApp.Migrations.InitialMigration.resources
 C:\Users\Djordje\documents\visual studio 2015\Projects\RealtimeTestApp\RealtimeTestApp\obj\Debug\RealtimeTestApp.csproj.GenerateResource.Cache
-C:\Users\Djordje\documents\visual studio 2015\Projects\RealtimeTestApp\RealtimeTestApp\obj\Debug\RealtimeTestApp.Migrations.addImageToAuctionAndLastBidUser.resources
-C:\Users\Djordje\documents\visual studio 2015\Projects\RealtimeTestApp\RealtimeTestApp\obj\Debug\RealtimeTestApp.Migrations.AddedNullabletoDateTimeAttributes.resources

@@ -181,24 +181,18 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\AuctionController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
+    <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Hubs\AuctionTicker.cs" />
     <Compile Include="Hubs\AuctionHub.cs" />
-    <Compile Include="Migrations\201701061657271_InitialModels.cs" />
-    <Compile Include="Migrations\201701061657271_InitialModels.Designer.cs">
-      <DependentUpon>201701061657271_InitialModels.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201701061803370_addImageToAuctionAndLastBidUser.cs" />
-    <Compile Include="Migrations\201701061803370_addImageToAuctionAndLastBidUser.Designer.cs">
-      <DependentUpon>201701061803370_addImageToAuctionAndLastBidUser.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201701061810352_AddedNullabletoDateTimeAttributes.cs" />
-    <Compile Include="Migrations\201701061810352_AddedNullabletoDateTimeAttributes.Designer.cs">
-      <DependentUpon>201701061810352_AddedNullabletoDateTimeAttributes.cs</DependentUpon>
+    <Compile Include="Migrations\201701121740141_InitialMigration.cs" />
+    <Compile Include="Migrations\201701121740141_InitialMigration.Designer.cs">
+      <DependentUpon>201701121740141_InitialMigration.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -207,7 +201,13 @@
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\Order.cs" />
+    <Compile Include="Models\OrderListViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Search\CompositeQueryStrategy.cs" />
+    <Compile Include="Search\PriceRangeQueryStrategy.cs" />
+    <Compile Include="Search\ProductNameQueryStrategy.cs" />
+    <Compile Include="Search\QueryStrategy.cs" />
+    <Compile Include="Search\StatusQueryStrategy.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -230,7 +230,7 @@
     <None Include="Properties\PublishProfiles\RealtimeTestApp20170104032859.pubxml" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
-    <Content Include="Scripts\Custom\realtime.js" />
+    <Content Include="Scripts\Custom\auctions.js" />
     <None Include="Scripts\jquery-3.1.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.1.1.js" />
     <Content Include="Scripts\jquery-3.1.1.min.js" />
@@ -239,6 +239,7 @@
     <None Include="Scripts\jquery.validate-vsdoc.js" />
     <Content Include="Scripts\jquery.signalR-2.2.1.js" />
     <Content Include="Scripts\jquery.signalR-2.2.1.min.js" />
+    <Content Include="Scripts\jquery.twbsPagination.min.js" />
     <Content Include="Scripts\jquery.validate.js" />
     <Content Include="Scripts\jquery.validate.min.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
@@ -283,10 +284,15 @@
     <Content Include="Views\Manage\VerifyPhoneNumber.cshtml" />
     <Content Include="Views\Shared\Lockout.cshtml" />
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
-    <Content Include="Views\Home\Auctions.cshtml" />
-    <Content Include="Views\Home\NewAuctionForm.cshtml" />
+    <Content Include="Views\Auction\Auctions.cshtml" />
+    <Content Include="Views\Auction\NewAuctionForm.cshtml" />
     <Content Include="Scripts\jquery-3.1.1.slim.min.map" />
     <Content Include="Scripts\jquery-3.1.1.min.map" />
+    <Content Include="Views\User\TokenOrderForm.cshtml" />
+    <Content Include="Views\User\OrderDetails.cshtml" />
+    <Content Include="Views\Auction\Auction.cshtml" />
+    <Content Include="Views\User\EditUserForm.cshtml" />
+    <Content Include="Views\Auction\WonAuctions.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -297,14 +303,8 @@
     <None Include="Project_Readme.html" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201701061657271_InitialModels.resx">
-      <DependentUpon>201701061657271_InitialModels.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201701061803370_addImageToAuctionAndLastBidUser.resx">
-      <DependentUpon>201701061803370_addImageToAuctionAndLastBidUser.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201701061810352_AddedNullabletoDateTimeAttributes.resx">
-      <DependentUpon>201701061810352_AddedNullabletoDateTimeAttributes.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201701121740141_InitialMigration.resx">
+      <DependentUpon>201701121740141_InitialMigration.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

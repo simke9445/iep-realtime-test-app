@@ -9,6 +9,7 @@ namespace RealtimeTestApp.Models
     {
         Draft,
         Ready,
+        Open,
         Sold,
         Expired
     }
@@ -26,5 +27,6 @@ namespace RealtimeTestApp.Models
         public string Image { get; set; }
         public ApplicationUser LastBidUser { get; set; }
         public string LastBidUserId { get; set; }
+        public string LastBidUserUserName { get; set; }
     }
 }

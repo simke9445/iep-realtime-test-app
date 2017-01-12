@@ -1,0 +1,30 @@
+﻿@model RealtimeTestApp.Models.ApplicationUser
+@{
+    ViewBag.Title = "EditForm";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>EditForm</h2>
+
+@using (Html.BeginForm("Edit", "User"))
+{
+    <div class="form-group">
+        @Html.LabelFor(m => m.FirstName)
+        @Html.TextBoxFor(m => m.FirstName, new {@class = "form-control"})
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.LastName)
+        @Html.TextBoxFor(m => m.LastName, new {@class = "form-control"})
+    </div>
+
+    <div class="form-group">
+        @Html.ActionLink("Change your password", "ChangePassword", "Manage")
+    </div>
+
+
+    @Html.HiddenFor(m => m.Id)
+
+    <button class="btn btn-primary" type="submit"> Submit </button>
+}
+

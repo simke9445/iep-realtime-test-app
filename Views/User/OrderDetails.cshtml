@@ -1,0 +1,13 @@
+﻿@model RealtimeTestApp.Models.Order
+@{
+    ViewBag.Title = "OrderDetails";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>OrderDetails</h2>
+@Html.DisplayFor(m => m.Id)
+@Html.DisplayFor(m => m.CreationDateTime);
+@Html.DisplayFor(m => m.PackagePrice)
+@Html.DisplayFor(m => m.State)
+@Html.DisplayFor(m => m.TokenAmount)
+

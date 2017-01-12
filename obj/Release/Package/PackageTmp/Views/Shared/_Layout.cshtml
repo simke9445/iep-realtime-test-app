@@ -24,8 +24,19 @@
                     <li>@Html.ActionLink("Home", "Index", "Home")</li>
                     <li>@Html.ActionLink("About", "About", "Home")</li>
                     <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
-                    <li>@Html.ActionLink("Auctions", "Auctions", "Home")</li>
-                    <li>@Html.ActionLink("Create Auction", "NewAuctionForm", "Home")</li>
+                    <li>@Html.ActionLink("Auctions", "Auctions", "Auction")</li>
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        if (User.IsInRole("Admin"))
+                        {
+                            <li>@Html.ActionLink("Create Auction", "NewAuctionForm", "Auction")</li>
+                        }
+                        else
+                        {
+                            <li>@Html.ActionLink("Order Tokens", "TokenOrderForm", "User")</li>
+                            <li>@Html.ActionLink("Won Auctions", "WonAuctions", "Auction")</li>
+                        }
+                    }
                 </ul>
                 @Html.Partial("_LoginPartial")
             </div>
