@@ -79,6 +79,16 @@ namespace RealtimeTestApp.Models
         [Display(Name = "Confirm password")]
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
+
+        [Required]
+        [Display(Name = "First Name")]
+        [StringLength(15, ErrorMessage = "The {0} must be at most {1} long")]
+        public string FirstName { get; set; }
+
+        [Required]
+        [Display(Name = "Last Name")]
+        [StringLength(15, ErrorMessage = "The {0} must be at most {1} long")]
+        public string LastName { get; set; }
     }
 
     public class ResetPasswordViewModel

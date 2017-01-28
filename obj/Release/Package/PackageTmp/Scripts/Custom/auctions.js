@@ -16,12 +16,15 @@ if (!String.prototype.supplant) {
 $(function() {
     $(document).on('click', '.extend',
         function () {
+            var t0 = performance.now();
+
             var userTokenStashSize = parseInt($("#userTokenStashSize").text());
             if (userTokenStashSize <= 0 || isNaN(userTokenStashSize)) {
                 return;
             }
 
-            var auctionJson = { 'id': $(this).closest("[data-id]").attr("data-id") };
+            //var auctionJson = { 'id': $(this).closest("[data-id]").attr("data-id") };
+            var auctionJson = {'id' : $(this).data("id")}
 
             $.ajax({
                 type: "POST",
@@ -31,7 +34,10 @@ $(function() {
                 dataType: "json",
                 success: function (data) {
                     $("#userTokenStashSize").text(userTokenStashSize - 1);
-                    console.log(data.status + " " + data.message);
+                    var t1 = performance.now();
+
+                    console.log("Ajax success completed in " + (t1 - t0) / 1000 + " seconds");
+                    console.log(data.message);
                 },
                 error: function(xhr, err) {
                     console.log(xhr + " " + err);
@@ -49,14 +55,14 @@ $(function() {
                     '<div class="panel panel-default" data-id={Id}>' +
                         '<div class="panel-heading"> <a href="Auction/{Id}"> Auction: {ProductName} </a> </div>' +
                         '<div class="panel-body text-center">' +
-                            '<img src={Image} class="img-rounded" />' +
+                            '<img src={Image} class="img-rounded auction-img" />' +
                             '<p class="price"> {StartingPrice} </p>' +
                             '<p class="time"> {Time} </p>' +
                             '<p class="last-bid-user"> {LastBidUserUserName} </p>' +
                             '<p class="state"> {State} </p> ' +
                         '</div>' +
                         '<div class="panel-footing text-center"> ' +
-                            '<button class="btn btn-primary extend">Extend</button>' +
+                            '<div class="btn btn-primary extend" data-id={Id}>Extend</div>' +
                         '</div> ' +
                     '</div> ' +
                 '</div>';
@@ -120,7 +126,6 @@ $(function() {
         });
 
         if (currentAuction != null) {
-            console.log(extendedAuction);
             currentAuction.auction = extendedAuction;
             currentAuction.dom.find(".last-bid-user").html(currentAuction.auction.LastBidUser.UserName);
             currentAuction.dom.find(".time").html(currentAuction.auction.Time);

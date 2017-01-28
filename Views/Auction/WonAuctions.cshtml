@@ -6,24 +6,22 @@
 
 <h2>WonAuctions</h2>
 
-<div class="container">
-    <div class="row-fluid">
-        @foreach (var auction in Model)
-        {
-            <div class="col-md-3">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        @Html.ActionLink(auction.ProductName, "Auction", "Auction", new { id = auction.Id}, new {@class="cool"})
-                    </div>
-                    <div class="panel-body text-center">
-                        <img src=@auction.Image class="img-rounded img-responsive" />
-                        <p class="price"> @auction.StartingPrice </p>
-                        <p class="time"> @auction.Time </p>
-                        <p class="last-bid-user"> @auction.LastBidUserUserName </p>
-                    </div>
+<div class="row-fluid">
+    @foreach (var auction in Model)
+    {
+        <div class="col-md-3">
+            <div class="panel panel-default">
+                <div class="panel-heading text-center">
+                    @Html.ActionLink(auction.ProductName, "Auction", "Auction", new { id = auction.Id }, new { @class = "cool" })
+                </div>
+                <div class="panel-body text-center">
+                    <img src=@auction.Image class="img-rounded img-responsive" />
+                    <p class="price"> @auction.StartingPrice </p>
+                    <p class="time"> @auction.Time </p>
+                    <p class="last-bid-user"> @auction.LastBidUserUserName </p>
                 </div>
             </div>
-        }
-    </div>
+        </div>
+    }
 </div>
 

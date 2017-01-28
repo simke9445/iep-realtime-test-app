@@ -13,7 +13,7 @@
    will truncate terms that are too long to fit in the left column 
 */
 .dl-horizontal dt {
-    white-space: normal;a
+    white-space: normal;
 }
 
 /* Set width on the form input elements since they're 100% wide by default */
@@ -23,11 +23,11 @@ textarea {
     max-width: 280px;
 }
 
-img {
-    position: relative;
-    width:  100px;
-    height: 100px;
-    background-position: 50% 50%;
-    background-repeat:   no-repeat;
-    background-size:     cover;
+.auction-img {
+    position: relative !important;
+    width:  100px !important;
+    height: 100px !important;
+    background-position: 50% 50% !important;
+    background-repeat:   no-repeat !important;
+    background-size:     cover !important;
 }

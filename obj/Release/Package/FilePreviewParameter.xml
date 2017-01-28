@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <parameters>
-  <parameter name="IIS Web Application Name" description="" value="RealtimeTestApp20170104032859" tags="IisApp">
-    <parameterEntry kind="ProviderPath" scope="IisApp" match="^c:\\users\\djordje\\documents\\visual\ studio\ 2015\\Projects\\RealtimeTestApp\\RealtimeTestApp\\obj\\Release\\Package\\PackageTmp$" />
-    <parameterEntry kind="ProviderPath" scope="setAcl" match="^c:\\users\\djordje\\documents\\visual\ studio\ 2015\\Projects\\RealtimeTestApp\\RealtimeTestApp\\obj\\Release\\Package\\PackageTmp$" />
+  <parameter name="IIS Web Application Name" description="" value="sd130162dd" tags="IisApp">
+    <parameterEntry kind="ProviderPath" scope="IisApp" match="^C:\\Users\\Djordje\\documents\\visual\ studio\ 2015\\Projects\\RealtimeTestApp\\RealtimeTestApp\\obj\\Release\\Package\\PackageTmp$" />
+    <parameterEntry kind="ProviderPath" scope="setAcl" match="^C:\\Users\\Djordje\\documents\\visual\ studio\ 2015\\Projects\\RealtimeTestApp\\RealtimeTestApp\\obj\\Release\\Package\\PackageTmp$" />
   </parameter>
   <parameter name="DefaultConnection-Web.config Connection String" description="" value="Data Source=sd130162d.database.windows.net;Initial Catalog=sd130162d;Persist Security Info=True;User ID=sd130162d;Password=Simovicdjordje94" tags="">
-    <parameterEntry kind="XmlFile" scope="c:\\users\\djordje\\documents\\visual\ studio\ 2015\\Projects\\RealtimeTestApp\\RealtimeTestApp\\obj\\Release\\Package\\PackageTmp\\Web\.config$" match="/configuration/connectionStrings/add[@name='DefaultConnection']/@connectionString" />
+    <parameterEntry kind="XmlFile" scope="C:\\Users\\Djordje\\documents\\visual\ studio\ 2015\\Projects\\RealtimeTestApp\\RealtimeTestApp\\obj\\Release\\Package\\PackageTmp\\Web\.config$" match="/configuration/connectionStrings/add[@name='DefaultConnection']/@connectionString" />
   </parameter>
 </parameters>

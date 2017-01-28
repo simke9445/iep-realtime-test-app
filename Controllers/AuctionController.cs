@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.AspNet.Identity.Owin;
 using RealtimeTestApp.Hubs;
 using RealtimeTestApp.Models;
 using RealtimeTestApp.Search;
@@ -23,7 +25,7 @@ namespace RealtimeTestApp.Controllers
         {
             ApplicationDbContext = new ApplicationDbContext();
             UserManager =
-                new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(ApplicationDbContext));
+                System.Web.HttpContext.Current.GetOwinContext().GetUserManager<ApplicationUserManager>();
         }
 
         // GET: Auction
@@ -62,7 +64,31 @@ namespace RealtimeTestApp.Controllers
         [HttpPost]
         public ActionResult NewAuction(Auction auction, HttpPostedFileBase file)
         {
-            if(file?.ContentLength > 0)
+            ModelState.Remove("Id");
+            if (file == null || file.ContentLength == 0)
+            {
+                ModelState.AddModelError("Image", "No file selected.");
+            }
+
+            try
+            {
+                if (file != null)
+                {
+                    var bitmap = Image.FromStream(file.InputStream);
+                }
+            }
+            catch
+            {
+                ModelState.AddModelError("Image", "Uploaded file should be an image.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View("NewAuctionForm", auction);
+            }
+
+
+            if (file?.ContentLength > 0)
             {
                 var folderPath = Server.MapPath("~/Content/Images");
                 Directory.CreateDirectory(folderPath);
@@ -73,7 +99,7 @@ namespace RealtimeTestApp.Controllers
 
             AuctionTicker.Instance.AddNewAuction(auction);
 
-            return RedirectToAction("Auctions", "Auction");
+            return RedirectToAction("Auctions", "Auction", auction);
         }
 
         public ActionResult NewAuctionForm()
@@ -81,13 +107,6 @@ namespace RealtimeTestApp.Controllers
             return View();
         }
 
-        [HttpPost]
-        public ActionResult ExtendAuction(long id)
-        {
-            AuctionTicker.Instance.ExtendAuction(id, UserManager.FindById(User.Identity.GetUserId()), ApplicationDbContext);
-
-            return Json(new { status = "Success", message = "Success" });
-        }
 
         public ActionResult SearchAuction(int? startingPrice, int? endingPrice, AuctionState? auctionStatus, bool priceQuery,
            bool statusQuery, String searchQuery)
@@ -128,6 +147,8 @@ namespace RealtimeTestApp.Controllers
             auction.OpeningDateTime = DateTime.Now;
 
             ApplicationDbContext.SaveChanges();
+
+            AuctionTicker.Instance.OpenAuction(auction);
 
             return RedirectToAction("Auction", new {id = id});
         }

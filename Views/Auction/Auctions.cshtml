@@ -6,8 +6,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<body>
-    <h2 class="text-center">Live Auctions Bidding</h2>
+<h2 class="text-center">Live Auctions Bidding</h2>
 <div id="auctionsTable" class="container">
     <div class="row form-horizontal">
         <div class="form-group">
@@ -25,13 +24,13 @@
                     </div>
                 </div>
                 <div class="col-md-6" hidden id="priceRangeDiv">
-                    <div class="col-md-6">
+                    <div class="col-md-6 no-padding-left">
                         <label for="startPriceRange" class="control-label ">Start Price</label>
                         <input type="number" id="startPriceRange" class="form-control" />
                     </div>
                     <div class="col-md-6">
                         <label for="endPriceRange" class="control-label">End Price</label>
-                        <input type="number" id="endPriceRange"  class="form-control"/>
+                        <input type="number" id="endPriceRange" class="form-control" />
                     </div>
                 </div>
             </div>
@@ -44,20 +43,20 @@
                     </div>
                 </div>
                 <div class="col-md-6" hidden id="statusDiv">
-                    @Html.DropDownList("auctionStatus", EnumHelper.GetSelectList(typeof(AuctionState)), "Select Status", new {@class="form-control"})
+                    @Html.DropDownList("auctionStatus", EnumHelper.GetSelectList(typeof(AuctionState)), "Select Status", new { @class = "form-control" })
                 </div>
             </div>
         </div>
-        <div class="row auctionTable">
-        </div>
-        <div class="row text-center">
-            <ul id="gallery" class="pagination-sm pagination"></ul>
-        </div>
     </div>
+    <div class="row auctionTable flex-row">
+    </div>
+    <div class="row text-center">
+        <ul id="gallery" class="pagination-sm pagination"></ul>
+    </div>
+
 </div>
 <div id="userTokenStashSize" hidden> @(Model?.TokenStashSize ?? 0) </div>
 
-</body>
 
 @section Scripts {
     @Scripts.Render("~/Scripts/jquery-3.1.1.min.js")
@@ -65,12 +64,12 @@
     @Scripts.Render("~/Scripts/jquery.twbsPagination.min.js")
     @Scripts.Render("~/signalr/hubs")
     @Scripts.Render("~/Scripts/Custom/auctions.js")
-    
+
     <script>
 
         $("#priceRange")
             .on("change",
-                function() {
+                function () {
                     if (this.checked) {
                         $("#priceRangeDiv").show();
                     } else {
@@ -80,7 +79,7 @@
 
         $("#status")
             .on("change",
-                function() {
+                function () {
                     if (this.checked) {
                         $("#statusDiv").show();
                     } else {
@@ -121,7 +120,40 @@
                                     dom.find(".extend").hide();
                                 }
 
-                                $auctionsTableBody.append(dom);
+                                if (loadedAuctions.length < 11) {
+                                    var lastBidUserName = dom.find(".last-bid-user"),
+                                        state = dom.find(".state");
+                                    if (lastBidUserName.text() === "{LastBidUserUserName}") {
+                                        lastBidUserName.text("No current bidder");
+                                    }
+
+                                    switch (state.text()) {
+                                        case "0":
+                                            state.text("Draft");
+                                            break;
+                                        case "1":
+                                            state.text("Ready");
+                                            break;
+                                        case "2":
+                                            state.text("Open");
+                                            break;
+                                        case "3":
+                                            state.text("Sold");
+                                            break;
+                                        case "4":
+                                            state.text("Expired");
+                                            break;
+                                    }
+
+                                    var time = dom.find(".time");
+                                    var minutes = Math.floor(this.Time / 60),
+                                        seconds = this.Time % 60;
+                                    var finalTime = (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds);
+                                    time.text(finalTime);
+
+
+                                    $auctionsTableBody.append(dom);
+                                }
                             });
 
                             var defaultPaginationOptions = {
@@ -132,7 +164,7 @@
 
                                     var startingIndexForPage = (page - 1) * 10;
 
-                                    for (var i = startingIndexForPage; i < loadedAuctions.length; i++) {
+                                    for (var i = startingIndexForPage; i < Math.min(loadedAuctions.length, page * 10) ; i++) {
                                         $auctionsTableBody.append(loadedAuctions[i].dom);
                                     }
 

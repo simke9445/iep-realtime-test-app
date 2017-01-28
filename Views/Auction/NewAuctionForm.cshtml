@@ -6,8 +6,10 @@
 }
 
 <h2>New Auction Form</h2>
-@using (Html.BeginForm("NewAuction", "Auction", FormMethod.Post, new { enctype ="multipart/form-data"}))
+@using (Html.BeginForm("NewAuction", "Auction", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary("", new { @class = "text-danger" })
     <div class="form-group">
         @Html.LabelFor(m => m.ProductName)
         @Html.TextBoxFor(m => m.ProductName, new { @class = "form-control" })

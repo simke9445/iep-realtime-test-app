@@ -35,6 +35,8 @@ namespace RealtimeTestApp
                 var user = new ApplicationUser
                 {
                     UserName = "admin@gmail.com",
+                    FirstName = "admin",
+                    LastName = "admin",
                     Email = "admin@gmail.com"
                 };
 

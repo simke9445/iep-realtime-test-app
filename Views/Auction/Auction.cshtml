@@ -6,29 +6,27 @@
 }
 
 <h2>Auction</h2>
-<div class="container">
-    <div class="row">
-        <div class="col-md-6">
-            <div class="panel panel-default">
-                <div class="panel-body">
-                    Product Name: <p id="productName">@Html.DisplayFor(m => m.ProductName)</p>
-                    Remaining Time: <p id="time">@Html.DisplayFor(m => m.Time)</p>
-                    Starting Price: <p id="startingPrice">@Html.DisplayFor(m => m.StartingPrice)</p>
-                    Status: <p id="status">@Html.DisplayFor(m => m.State)</p>
-                    @if (User.Identity.IsAuthenticated && User.IsInRole("Admin") && Model.State == AuctionState.Ready )
-                    {
-                        @Html.ActionLink("Delete", "Delete", "Auction", new { id = Model.Id}, new {@class="btn btn-primary"})
-                        @Html.ActionLink("Edit", "EditForm", "Auction", new { id = Model.Id }, new { @class = "btn btn-primary" })
-                        @Html.ActionLink("Open", "Open", "Auction", new { id = Model.Id }, new { @class = "btn btn-primary" })
-                    }
-                    
-                </div>
+<div class="row">
+    <div class="col-md-6">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                Product Name: <p id="productName">@Html.DisplayFor(m => m.ProductName)</p>
+                Remaining Time: <p id="time">@Html.DisplayFor(m => m.Time)</p>
+                Starting Price: <p id="startingPrice">@Html.DisplayFor(m => m.StartingPrice)</p>
+                Status: <p id="status">@Html.DisplayFor(m => m.State)</p>
+                @if (User.Identity.IsAuthenticated && User.IsInRole("Admin") && Model.State == AuctionState.Ready)
+                {
+                    @Html.ActionLink("Delete", "Delete", "Auction", new { id = Model.Id }, new { @class = "btn btn-primary" })
+                    @Html.ActionLink("Edit", "EditForm", "Auction", new { id = Model.Id }, new { @class = "btn btn-primary" })
+                    @Html.ActionLink("Open", "Open", "Auction", new { id = Model.Id }, new { @class = "btn btn-primary" })
+                }
+
             </div>
         </div>
-        <div class="col-md-6" id="bids">
-        </div>
-        <div id="auctionId" hidden>@Model.Id</div>
     </div>
+    <div class="col-md-6" id="bids">
+    </div>
+    <div id="auctionId" hidden>@Model.Id</div>
 </div>
 
 @section Scripts {
@@ -41,9 +39,9 @@
 
         // A simple templating method for replacing placeholders enclosed in curly braces.
         if (!String.prototype.supplant) {
-            String.prototype.supplant = function(o) {
+            String.prototype.supplant = function (o) {
                 return this.replace(/{([^{}]*)}/g,
-                    function(a, b) {
+                    function (a, b) {
                         var r = o[b];
                         return typeof r === 'string' || typeof r === 'number' ? r : a;
                     }
@@ -54,7 +52,7 @@
 
         var ticker, rowTemplate, $bidsBody = $("#bids");
 
-        $(function() {
+        $(function () {
 
             ticker = $.connection.auctionTicker;
             rowTemplate = '<p> {UserName} </p>';
@@ -92,11 +90,11 @@
                 if ($("#status").text() === "Open") {
                     $("#time").text(time - 1);
                 }
-                
+
             };
 
             ticker.client.extendAuction = function (auction, extendPeriod) {
-                if(auction.Id === parseInt($("#auctionId").text())) {
+                if (auction.Id === parseInt($("#auctionId").text())) {
                     var dom = $($.parseHTML(rowTemplate.supplant(auction.LastBidUser)));
                     loadedBids.push({
                         'bid': null,

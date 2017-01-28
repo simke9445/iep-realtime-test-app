@@ -8,6 +8,8 @@
 
 @using (Html.BeginForm("Edit", "User"))
 {
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary("", new { @class = "text-danger" })
     <div class="form-group">
         @Html.LabelFor(m => m.FirstName)
         @Html.TextBoxFor(m => m.FirstName, new {@class = "form-control"})

@@ -4,9 +4,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Web;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Hubs;
 using RealtimeTestApp.Models;
+using Microsoft.AspNet.Identity.Owin;
 
 namespace RealtimeTestApp.Hubs
 {
@@ -32,6 +35,11 @@ namespace RealtimeTestApp.Hubs
         public IEnumerable<Bid> GetAllBids(long auctionId)
         {
             return _auctionTicker.GetAllBids(auctionId);
+        }
+
+        public void Bid(long auctionId)
+        {
+            _auctionTicker.Bid(auctionId, Context.User.Identity.GetUserId());
         }
 
     }

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Mail;
 using System.Web;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
@@ -40,6 +42,17 @@ namespace RealtimeTestApp.Controllers
         [HttpPost]
         public ActionResult Edit(ApplicationUser user)
         {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+
+            if (user.Id != User.Identity.GetUserId())
+            {
+                RedirectToAction("EditForm", "Auction");
+            }
+
             var userInDb = ApplicationDbContext.Users.Single(u => u.Id == user.Id);
             userInDb.FirstName = user.FirstName;
             userInDb.LastName = user.LastName;
@@ -79,6 +92,46 @@ namespace RealtimeTestApp.Controllers
             ApplicationDbContext.SaveChanges();
 
             return RedirectToAction("Auctions", "Auction");
+        }
+
+       
+        public ActionResult TokenOrderConfirmation(string clientid, int amount, string status)
+        {
+            if (UserManager.FindById(clientid) == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.NotAcceptable);
+            }
+            var user = UserManager.FindById(clientid);
+            Order order = new Order()
+            {
+                User = user,
+                TokenAmount = (TokenPackage)amount,
+                CreationDateTime = DateTime.Now,
+                PackagePrice = 10,
+                State = status.Equals("success") ? OrderState.Confirmed : OrderState.Canceled
+            };
+
+            order.User.TokenStashSize += (int) order.TokenAmount;
+
+            ApplicationDbContext.Orders.Add(order);
+            ApplicationDbContext.SaveChanges();
+
+
+            MailMessage mail = new MailMessage("auction@iep.com", user.Email);
+            SmtpClient client = new SmtpClient
+            {
+                Port = 25,
+                DeliveryMethod = SmtpDeliveryMethod.Network,
+                UseDefaultCredentials = false,
+                Host = "smtp.google.com"
+            };
+            mail.Subject = "[TokenOrder]";
+            mail.Body = "Token Order " + order.State + " for token package " + order.TokenAmount;
+            client.Send(mail);
+
+
+
+            return new HttpStatusCodeResult(HttpStatusCode.Accepted);
         }
 
         public ActionResult OrderDetails(Order order)

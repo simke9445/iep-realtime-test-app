@@ -70,6 +70,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Activities" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Web.DynamicData" />
@@ -190,9 +191,13 @@
     </Compile>
     <Compile Include="Hubs\AuctionTicker.cs" />
     <Compile Include="Hubs\AuctionHub.cs" />
-    <Compile Include="Migrations\201701121740141_InitialMigration.cs" />
-    <Compile Include="Migrations\201701121740141_InitialMigration.Designer.cs">
-      <DependentUpon>201701121740141_InitialMigration.cs</DependentUpon>
+    <Compile Include="Migrations\201701280004228_InitialMigration.cs" />
+    <Compile Include="Migrations\201701280004228_InitialMigration.Designer.cs">
+      <DependentUpon>201701280004228_InitialMigration.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201701280040286_NullableIdAuction.cs" />
+    <Compile Include="Migrations\201701280040286_NullableIdAuction.Designer.cs">
+      <DependentUpon>201701280040286_NullableIdAuction.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -231,6 +236,10 @@
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Scripts\Custom\auctions.js" />
+    <None Include="Properties\PublishProfiles\sd130162d - Web Deploy.pubxml" />
+    <None Include="Properties\PublishProfiles\sd130162d.pubxml" />
+    <None Include="Properties\PublishProfiles\sd130162dd - Web Deploy.pubxml" />
+    <None Include="Properties\PublishProfiles\sd130162dd.pubxml" />
     <None Include="Scripts\jquery-3.1.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.1.1.js" />
     <Content Include="Scripts\jquery-3.1.1.min.js" />
@@ -291,7 +300,7 @@
     <Content Include="Views\User\TokenOrderForm.cshtml" />
     <Content Include="Views\User\OrderDetails.cshtml" />
     <Content Include="Views\Auction\Auction.cshtml" />
-    <Content Include="Views\User\EditUserForm.cshtml" />
+    <Content Include="Views\User\EditForm.cshtml" />
     <Content Include="Views\Auction\WonAuctions.cshtml" />
   </ItemGroup>
   <ItemGroup>
@@ -303,8 +312,14 @@
     <None Include="Project_Readme.html" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201701121740141_InitialMigration.resx">
-      <DependentUpon>201701121740141_InitialMigration.cs</DependentUpon>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201701280004228_InitialMigration.resx">
+      <DependentUpon>201701280004228_InitialMigration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201701280040286_NullableIdAuction.resx">
+      <DependentUpon>201701280040286_NullableIdAuction.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

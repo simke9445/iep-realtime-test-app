@@ -1,13 +1,23 @@
-﻿@model RealtimeTestApp.Models.Order
+﻿@using RealtimeTestApp.Models
+@model RealtimeTestApp.Models.Order
 @{
     ViewBag.Title = "OrderDetails";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <h2>OrderDetails</h2>
-@Html.DisplayFor(m => m.Id)
-@Html.DisplayFor(m => m.CreationDateTime);
-@Html.DisplayFor(m => m.PackagePrice)
-@Html.DisplayFor(m => m.State)
-@Html.DisplayFor(m => m.TokenAmount)
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="panel panel-default">
+            <div class="panel-heading">@Model.Id</div>
+            <div class="panel-body">
+                <p>@Model.CreationDateTime</p>
+                <p>@Model.PackagePrice</p>
+                <p>@Model.TokenAmount</p>
+                <p>@Model.State.ToString()</p>
+            </div>
+        </div>
+    </div>
+</div>
 

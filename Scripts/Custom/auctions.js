@@ -21,43 +21,42 @@ $(function() {
                 return;
             }
 
-            var auctionJson = { 'id': $(this).closest("[data-id]").attr("data-id") };
+            var auctionId = $(this).data("id");
 
-            $.ajax({
-                type: "POST",
-                contentType: "application/json; charset=utf-8",
-                url: '/Auction/ExtendAuction',
-                data: JSON.stringify(auctionJson),
-                dataType: "json",
-                success: function (data) {
-                    $("#userTokenStashSize").text(userTokenStashSize - 1);
-                    console.log(data.status + " " + data.message);
-                },
-                error: function(xhr, err) {
-                    console.log(xhr + " " + err);
-                }
-            });
+            $.connection.auctionTicker.server.bid(auctionId);
+
         });
 });
 
 var ticker, rowTemplate, $auctionsTable = $("#auctionsTable"), $auctionsTableBody = $auctionsTable.find(".auctionTable");
 
+
 $(function() {
     
     ticker = $.connection.auctionTicker;
     rowTemplate = '<div class="col-md-3"> ' +
-                    '<div class="panel panel-default" data-id={Id}>' +
-                        '<div class="panel-heading"> <a href="Auction/{Id}"> Auction: {ProductName} </a> </div>' +
+                    '<div class="panel panel-default panel-auction" data-id={Id}>' +
+                        '<div class="panel-heading text-center"> <a href="Auction/{Id}"> {ProductName} </a> </div>' +
                         '<div class="panel-body text-center">' +
-                            '<img src={Image} class="img-rounded" />' +
-                            '<p class="price"> {StartingPrice} </p>' +
-                            '<p class="time"> {Time} </p>' +
-                            '<p class="last-bid-user"> {LastBidUserUserName} </p>' +
-                            '<p class="state"> {State} </p> ' +
+                            '<img src={Image} class="img-rounded auction-img" />' +
+                            '<table class="table">' +
+                                '<tr><td>' +
+                                    '<p class="price">${StartingPrice}</p>' +
+                                '</td></tr>' +
+                                '<tr><td>' +
+                                    '<p class="last-bid-user">{LastBidUserUserName}</p>' +
+                                '</td></tr>' +
+                                '<tr><td>' +
+                                    '<p class="time">{Time}</p>' +
+                                '</td></tr>' +
+                                '<tr><td>' +
+                                    '<p class="state">{State}</p> ' +
+                                '</td></tr>' +
+                                '<tr><td class="text-center">' +
+                                    '<div class="btn btn-primary extend" data-id={Id}>Extend</div>' +
+                                '</td></tr>' +
+                            '</table>' +
                         '</div>' +
-                        '<div class="panel-footing text-center"> ' +
-                            '<button class="btn btn-primary extend">Extend</button>' +
-                        '</div> ' +
                     '</div> ' +
                 '</div>';
 
@@ -71,7 +70,40 @@ $(function() {
                     'auction': this,
                     'dom': dom
                 });
-                $auctionsTableBody.append(dom);
+                if (loadedAuctions.length < 11) {
+                    var lastBidUserName = dom.find(".last-bid-user"),
+                        state = dom.find(".state"),
+                        time = dom.find(".time");
+                    if (lastBidUserName.text() === "{LastBidUserUserName}") {
+                        lastBidUserName.text("No current bidder");
+                    }
+
+                    switch(state.text()) {
+                        case "0":
+                            state.text("Draft");
+                            break;
+                        case "1":
+                            state.text("Ready");
+                            break;
+                        case "2":
+                            state.text("Open");
+                            break;
+                        case "3":
+                            state.text("Sold");
+                            break;
+                        case "4":
+                            state.text("Expired");
+                            break;
+                    }
+
+                    var minutes = Math.floor(this.Time / 60),
+                        seconds = this.Time % 60;
+
+                    var finalTime = (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds);
+                    time.text(finalTime);
+
+                    $auctionsTableBody.append(dom);
+                }
             });
 
             var defaultPaginationOptions = {
@@ -99,7 +131,11 @@ $(function() {
         $.each(loadedAuctions,
             function () {
                 if (this.auction.State === 2) {
-                    this.dom.find(".time").html(this.auction.Time - 1);
+
+                    var minutes = Math.floor(this.auction.Time / 60),
+                        seconds = this.auction.Time % 60;
+                    var finalTime = (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds);
+                    this.dom.find(".time").text(finalTime);
                     this.auction.Time = this.auction.Time - 1;
                 }
             });
@@ -120,11 +156,17 @@ $(function() {
         });
 
         if (currentAuction != null) {
-            console.log(extendedAuction);
             currentAuction.auction = extendedAuction;
             currentAuction.dom.find(".last-bid-user").html(currentAuction.auction.LastBidUser.UserName);
-            currentAuction.dom.find(".time").html(currentAuction.auction.Time);
-            currentAuction.dom.find(".price").html(currentAuction.auction.StartingPrice);
+            currentAuction.dom.find(".price").html("$" + currentAuction.auction.StartingPrice);
+
+            var minutes = Math.floor(currentAuction.auction.Time / 60),
+                seconds = currentAuction.auction.Time % 60;
+            var finalTime = (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds);
+            console.log(finalTime);
+            currentAuction.dom.find(".time").text(finalTime);
+
+
         }
     };
 
@@ -143,6 +185,21 @@ $(function() {
             }
         }
     }
+
+
+    ticker.client.openAuction = function(openedAuction) {
+        
+        var currentAuction = loadedAuctions.find(function (auction) {
+            return auction.auction.Id === openedAuction.Id;
+        });
+
+        if (currentAuction != null) {
+            currentAuction.auction = openedAuction;
+            currentAuction.dom.find(".state").text("Open");
+            currentAuction.dom.find(".extend").show();
+        }
+    }
+
 
     // Start the connection
     $.connection.hub.start().done(init);

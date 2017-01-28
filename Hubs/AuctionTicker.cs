@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.Entity.Migrations;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,6 +12,8 @@ using System.Web.Helpers;
 using System.Web.Mvc;
 using System.Web.UI.WebControls;
 using Microsoft.Ajax.Utilities;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.Owin;
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Hubs;
 using RealtimeTestApp.Models;
@@ -42,17 +45,17 @@ namespace RealtimeTestApp.Hubs
             {
                 using (var context = new ApplicationDbContext())
                 {
-                     Parallel.ForEach(context.Auctions.Where(item => item.State == AuctionState.Open), item =>
-                      {
-                          if (item.Time == 0)
-                          {
-                              RemoveAuction(item);
-                          }
-                          else
-                          {
-                              item.Time--;
-                          }
-                      });
+                    Parallel.ForEach(context.Auctions.Where(item => item.State == AuctionState.Open), item =>
+                    {
+                        if (item.Time == 0)
+                        {
+                            RemoveAuction(item);
+                        }
+                        else
+                        {
+                            item.Time--;
+                        }
+                    });
 
                     context.SaveChanges();
                     Clients.All.tick();
@@ -72,7 +75,7 @@ namespace RealtimeTestApp.Hubs
                         myAuction.ProductName = auction.ProductName;
                         myAuction.StartingPrice = auction.StartingPrice;
                         myAuction.Time = auction.Time;
-                        if(!String.IsNullOrWhiteSpace(auction.Image))
+                        if (!String.IsNullOrWhiteSpace(auction.Image))
                             myAuction.Image = auction.Image;
                     }
                     else
@@ -82,7 +85,7 @@ namespace RealtimeTestApp.Hubs
                         auction.OpeningDateTime = DateTime.Now;
                         context.Auctions.Add(auction);
                     }
-                   
+
                     context.SaveChanges();
                     Clients.All.newAuction(auction);
                 }
@@ -90,34 +93,49 @@ namespace RealtimeTestApp.Hubs
 
         }
 
-        public void ExtendAuction(long id, ApplicationUser user, ApplicationDbContext context)
+        public void Bid(long auctionId, string userId)
         {
-            lock (Lock)
+            using (var context = new ApplicationDbContext())
             {
-                Auction auction = context.Auctions.FirstOrDefault(item => item.Id == id);
-                if (auction != null)
+                var user = context.Users.Find(userId);
+                
+                if (user.TokenStashSize <= 0)
                 {
-                    user.TokenStashSize--;
-                    auction.LastBidUser = user;
-                    auction.LastBidUserUserName = user.UserName;
-                    auction.Time += ExtendPeriod;
-                    auction.StartingPrice++;
-                    Bid bid = new Bid
+                    return;
+                }
+
+                lock (Lock)
+                {
+                    Auction auction = context.Auctions.First(item => item.Id == auctionId && item.State == AuctionState.Open);
+                    if (auction != null)
                     {
-                        User = user,
-                        Auction = auction,
-                        CreationDateTime = DateTime.Now,
-                        UserName = user.UserName
-                    };
+                        user.TokenStashSize--;
+                        auction.LastBidUser = user;
+                        auction.LastBidUserUserName = user.UserName;
+                        auction.Time += ExtendPeriod;
+                        auction.StartingPrice++;
+                        Bid bid = new Bid
+                        {
+                            User = user,
+                            Auction = auction,
+                            CreationDateTime = DateTime.Now,
+                            UserName = user.UserName
+                        };
 
-                    context.Bids.Add(bid);
-                    context.SaveChanges();
+                        context.Bids.Add(bid);
+                        context.SaveChanges();
 
-                    
-                    Clients.All.extendAuction(auction, ExtendPeriod);
+                        Clients.All.extendAuction(auction, ExtendPeriod);
+                    }
+
                 }
             }
+        }
 
+
+        public void OpenAuction(Auction auction)
+        {
+            Clients.All.OpenAuction(auction);
         }
 
         public void RemoveAuction(Auction auction)
@@ -125,7 +143,7 @@ namespace RealtimeTestApp.Hubs
             using (var context = new ApplicationDbContext())
             {
                 auction = context.Auctions.First(item => item.Id == auction.Id);
-                auction.State =  auction.LastBidUserId != null ? AuctionState.Sold : AuctionState.Expired;
+                auction.State = auction.LastBidUserId != null ? AuctionState.Sold : AuctionState.Expired;
                 auction.ClosingDateTime = DateTime.Now;
                 context.SaveChanges();
             }

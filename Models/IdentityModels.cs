@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Data.Entity;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -18,8 +19,16 @@ namespace RealtimeTestApp.Models
             return userIdentity;
         }
 
+        [Required]
+        [Display(Name = "First Name")]
+        [StringLength(15, ErrorMessage = "The {0} must be at most {1} long")]
         public string FirstName { get; set; }
+
+        [Required]
+        [Display(Name = "Last Name")]
+        [StringLength(15, ErrorMessage = "The {0} must be at most {1} long")]
         public string LastName { get; set; }
+
         public int TokenStashSize { get; set; }
            
     }
