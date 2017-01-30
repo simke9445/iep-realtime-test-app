@@ -68,7 +68,6 @@ C:\Users\Djordje\documents\visual studio 2015\Projects\RealtimeTestApp\RealtimeT
 C:\Users\Djordje\documents\visual studio 2015\Projects\RealtimeTestApp\RealtimeTestApp\bin\Microsoft.Owin.Security.Google.xml
 C:\Users\Djordje\documents\visual studio 2015\Projects\RealtimeTestApp\RealtimeTestApp\bin\Microsoft.Owin.Security.Twitter.xml
 C:\Users\Djordje\documents\visual studio 2015\Projects\RealtimeTestApp\RealtimeTestApp\bin\Microsoft.Owin.Security.MicrosoftAccount.xml
-C:\Users\Djordje\documents\visual studio 2015\Projects\RealtimeTestApp\RealtimeTestApp\obj\Debug\RealtimeTestApp.csprojResolveAssemblyReference.cache
 C:\Users\Djordje\documents\visual studio 2015\Projects\RealtimeTestApp\RealtimeTestApp\obj\Debug\RealtimeTestApp.dll
 C:\Users\Djordje\documents\visual studio 2015\Projects\RealtimeTestApp\RealtimeTestApp\obj\Debug\RealtimeTestApp.pdb
 C:\Users\Djordje\Documents\Visual Studio 2015\Projects\RealtimeTestApp\RealtimeTestApp\bin\roslyn\csc.exe.config

@@ -30,7 +30,7 @@ var auctionsPerPage = 10;
 
 
 function updateAuctionDom(dom, auction) {
-    if (auction.lastBidUser != null) {
+    if (auction.LastBidUser != null) {
         dom.find(".last-bid-user").html(auction.LastBidUser.UserName);
     }
     dom.find(".price").html("$" + auction.StartingPrice);
