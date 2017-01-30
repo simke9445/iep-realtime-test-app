@@ -1,0 +1,91 @@
+
+    CREATE TABLE [dbo].[Auctions] (
+        [Id] [bigint] NOT NULL IDENTITY,
+        [ProductName] [nvarchar](20) NOT NULL,
+        [Time] [int] NOT NULL,
+        [StartingPrice] [int] NOT NULL,
+        [CreationDateTime] [datetime],
+        [OpeningDateTime] [datetime],
+        [ClosingDateTime] [datetime],
+        [State] [int] NOT NULL,
+        [Image] [nvarchar](max),
+        [LastBidUserId] [nvarchar](128),
+        [LastBidUserUserName] [nvarchar](max),
+        CONSTRAINT [PK_dbo.Auctions] PRIMARY KEY ([Id])
+    )
+    CREATE INDEX [IX_LastBidUserId] ON [dbo].[Auctions]([LastBidUserId])
+    CREATE TABLE [dbo].[AspNetUsers] (
+        [Id] [nvarchar](128) NOT NULL,
+        [FirstName] [nvarchar](15) NOT NULL,
+        [LastName] [nvarchar](15) NOT NULL,
+        [TokenStashSize] [int] NOT NULL,
+        [Email] [nvarchar](256),
+        [EmailConfirmed] [bit] NOT NULL,
+        [PasswordHash] [nvarchar](max),
+        [SecurityStamp] [nvarchar](max),
+        [PhoneNumber] [nvarchar](max),
+        [PhoneNumberConfirmed] [bit] NOT NULL,
+        [TwoFactorEnabled] [bit] NOT NULL,
+        [LockoutEndDateUtc] [datetime],
+        [LockoutEnabled] [bit] NOT NULL,
+        [AccessFailedCount] [int] NOT NULL,
+        [UserName] [nvarchar](256) NOT NULL,
+        CONSTRAINT [PK_dbo.AspNetUsers] PRIMARY KEY ([Id])
+    )
+    CREATE UNIQUE INDEX [UserNameIndex] ON [dbo].[AspNetUsers]([UserName])
+    CREATE TABLE [dbo].[AspNetUserClaims] (
+        [Id] [int] NOT NULL IDENTITY,
+        [UserId] [nvarchar](128) NOT NULL,
+        [ClaimType] [nvarchar](max),
+        [ClaimValue] [nvarchar](max),
+        CONSTRAINT [PK_dbo.AspNetUserClaims] PRIMARY KEY ([Id])
+    )
+    CREATE INDEX [IX_UserId] ON [dbo].[AspNetUserClaims]([UserId])
+    CREATE TABLE [dbo].[AspNetUserLogins] (
+        [LoginProvider] [nvarchar](128) NOT NULL,
+        [ProviderKey] [nvarchar](128) NOT NULL,
+        [UserId] [nvarchar](128) NOT NULL,
+        CONSTRAINT [PK_dbo.AspNetUserLogins] PRIMARY KEY ([LoginProvider], [ProviderKey], [UserId])
+    )
+    CREATE INDEX [IX_UserId] ON [dbo].[AspNetUserLogins]([UserId])
+    CREATE TABLE [dbo].[AspNetUserRoles] (
+        [UserId] [nvarchar](128) NOT NULL,
+        [RoleId] [nvarchar](128) NOT NULL,
+        CONSTRAINT [PK_dbo.AspNetUserRoles] PRIMARY KEY ([UserId], [RoleId])
+    )
+    CREATE INDEX [IX_UserId] ON [dbo].[AspNetUserRoles]([UserId])
+    CREATE INDEX [IX_RoleId] ON [dbo].[AspNetUserRoles]([RoleId])
+    CREATE TABLE [dbo].[Bids] (
+        [Id] [bigint] NOT NULL IDENTITY,
+        [CreationDateTime] [datetime],
+        [AuctionId] [bigint] NOT NULL,
+        [UserId] [nvarchar](128),
+        [UserName] [nvarchar](max),
+        CONSTRAINT [PK_dbo.Bids] PRIMARY KEY ([Id])
+    )
+    CREATE INDEX [IX_AuctionId] ON [dbo].[Bids]([AuctionId])
+    CREATE INDEX [IX_UserId] ON [dbo].[Bids]([UserId])
+    CREATE TABLE [dbo].[Orders] (
+        [Id] [bigint] NOT NULL IDENTITY,
+        [TokenAmount] [int] NOT NULL,
+        [PackagePrice] [int] NOT NULL,
+        [CreationDateTime] [datetime],
+        [State] [int] NOT NULL,
+        [UserId] [nvarchar](128),
+        CONSTRAINT [PK_dbo.Orders] PRIMARY KEY ([Id])
+    )
+    CREATE INDEX [IX_UserId] ON [dbo].[Orders]([UserId])
+    CREATE TABLE [dbo].[AspNetRoles] (
+        [Id] [nvarchar](128) NOT NULL,
+        [Name] [nvarchar](256) NOT NULL,
+        CONSTRAINT [PK_dbo.AspNetRoles] PRIMARY KEY ([Id])
+    )
+    CREATE UNIQUE INDEX [RoleNameIndex] ON [dbo].[AspNetRoles]([Name])
+    ALTER TABLE [dbo].[Auctions] ADD CONSTRAINT [FK_dbo.Auctions_dbo.AspNetUsers_LastBidUserId] FOREIGN KEY ([LastBidUserId]) REFERENCES [dbo].[AspNetUsers] ([Id])
+    ALTER TABLE [dbo].[AspNetUserClaims] ADD CONSTRAINT [FK_dbo.AspNetUserClaims_dbo.AspNetUsers_UserId] FOREIGN KEY ([UserId]) REFERENCES [dbo].[AspNetUsers] ([Id]) ON DELETE CASCADE
+    ALTER TABLE [dbo].[AspNetUserLogins] ADD CONSTRAINT [FK_dbo.AspNetUserLogins_dbo.AspNetUsers_UserId] FOREIGN KEY ([UserId]) REFERENCES [dbo].[AspNetUsers] ([Id]) ON DELETE CASCADE
+    ALTER TABLE [dbo].[AspNetUserRoles] ADD CONSTRAINT [FK_dbo.AspNetUserRoles_dbo.AspNetUsers_UserId] FOREIGN KEY ([UserId]) REFERENCES [dbo].[AspNetUsers] ([Id]) ON DELETE CASCADE
+    ALTER TABLE [dbo].[AspNetUserRoles] ADD CONSTRAINT [FK_dbo.AspNetUserRoles_dbo.AspNetRoles_RoleId] FOREIGN KEY ([RoleId]) REFERENCES [dbo].[AspNetRoles] ([Id]) ON DELETE CASCADE
+    ALTER TABLE [dbo].[Bids] ADD CONSTRAINT [FK_dbo.Bids_dbo.Auctions_AuctionId] FOREIGN KEY ([AuctionId]) REFERENCES [dbo].[Auctions] ([Id]) ON DELETE CASCADE
+    ALTER TABLE [dbo].[Bids] ADD CONSTRAINT [FK_dbo.Bids_dbo.AspNetUsers_UserId] FOREIGN KEY ([UserId]) REFERENCES [dbo].[AspNetUsers] ([Id])
+    ALTER TABLE [dbo].[Orders] ADD CONSTRAINT [FK_dbo.Orders_dbo.AspNetUsers_UserId] FOREIGN KEY ([UserId]) REFERENCES [dbo].[AspNetUsers] ([Id])
