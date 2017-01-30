@@ -4,38 +4,38 @@
     ViewBag.Title = "TokenOrderForm";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<h2>TokenOrderForm</h2>
-<div class="row">
-    @using (Html.BeginForm("TokenOrder", "User"))
+<div class="row" style="padding-bottom: 5%;">
+    <h2>Token Order Page</h2>
+    @*@using (Html.BeginForm("TokenOrder", "User"))
     {
         <div class="form-group">
             @Html.LabelFor(m => m.Order.TokenAmount)
-            @Html.EnumDropDownListFor(m => m.Order.TokenAmount, "Select Amount Package", new { @class = "form-control" })
+            @Html.EnumDropDownListFor(m => m.Order.TokenAmount, "Select Amount Package", new {@class = "form-control"})
         </div>
 
-            <button class="btn btn-primary" type="submit"> Submit </button>
-    }
+        <button class="btn btn-primary" type="submit"> Submit </button>
+    }*@
 
-    <a id="c-mobile-payment-widget" style="padding: 25px 0 25px 0;" href=@("http://stage.centili.com/widget/WidgetModule?api=681ca1fa4eee1227adf277e272dd7b44&clientId=" + User.Identity.GetUserId())>
-        <img src="https://www.centili.com/images/centili-widget-button.png" />
+    <a id="c-mobile-payment-widget"  href=@("http://stage.centili.com/widget/WidgetModule?api=681ca1fa4eee1227adf277e272dd7b44&clientId=" + User.Identity.GetUserId())>
+        <img style="padding-top: 1.5%;" src="https://www.centili.com/images/centili-widget-button.png"/>
     </a>
 
 </div>
 
 
-<div class="row-fluid">
+<div class="row">
     @foreach (var order in Model.Orders)
     {
         <div class="col-md-2">
-            <div class="panel panel-default">
-                <div class="panel-heading">@order.Id</div>
+            <div class="panel panel-primary">
+                <div class="panel-heading text-center">@order.Id</div>
                 <div class="panel-body">
                     <p>@order.CreationDateTime</p>
                     <p>@order.PackagePrice</p>
                     <p>@order.TokenAmount</p>
                     <p>@order.State.ToString()</p>
                 </div>
-                <div class="panel-footer text-left">
+                <div class="panel-footer text-center">
                     @Html.ActionLink("Details", "OrderDetails", "User", order, new { @class = "btn btn-primary" });
                 </div>
             </div>

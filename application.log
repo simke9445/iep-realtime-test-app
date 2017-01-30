@@ -1,0 +1,12 @@
+2017-01-29 19:08:46,042 INFO RealtimeTestApp.Hubs.AuctionTicker - Get All Auctions
+2017-01-29 19:09:02,356 INFO RealtimeTestApp.Hubs.AuctionTicker - Get All Auctions
+2017-01-29 19:09:02,879 INFO RealtimeTestApp.Hubs.AuctionTicker - Get All Auctions
+2017-01-29 19:09:03,358 INFO RealtimeTestApp.Hubs.AuctionTicker - Get All Auctions
+2017-01-29 19:09:03,695 INFO RealtimeTestApp.Hubs.AuctionTicker - Get All Auctions
+2017-01-29 19:09:05,216 INFO RealtimeTestApp.Hubs.AuctionTicker - Get All Auctions
+2017-01-29 19:09:05,689 INFO RealtimeTestApp.Hubs.AuctionTicker - Get All Auctions
+2017-01-29 19:09:06,099 INFO RealtimeTestApp.Hubs.AuctionTicker - Get All Auctions
+2017-01-29 19:29:26,677 INFO RealtimeTestApp.Controllers.UserController - Edited User 1417d208-22d5-4452-b540-df6d6c932d5b
+2017-01-29 19:35:59,805 INFO RealtimeTestApp.Controllers.UserController - Edited User d74e6f31-a316-427d-afc5-034df94fb18c
+2017-01-30 10:49:28,908 INFO RealtimeTestApp.Controllers.AuctionController - Auction 18 Edited
+2017-01-30 10:49:42,748 INFO RealtimeTestApp.Controllers.AuctionController - Auction 18 Deleted

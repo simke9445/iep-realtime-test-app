@@ -17,7 +17,7 @@ namespace RealtimeTestApp.Controllers
 
         public ActionResult Index()
         {
-            return View();
+            return RedirectToAction("Auctions", "Auction");
         }
 
         

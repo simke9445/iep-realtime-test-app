@@ -29,6 +29,10 @@ namespace RealtimeTestApp.Hubs
         private static readonly object Lock = new object();
         private static readonly int ExtendPeriod = 10;
 
+
+        private static readonly log4net.ILog Log =
+            log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         public static AuctionTicker Instance => _instance.Value;
         public IHubConnectionContext<dynamic> Clients { get; set; }
 
@@ -49,7 +53,10 @@ namespace RealtimeTestApp.Hubs
                     {
                         if (item.Time == 0)
                         {
-                            RemoveAuction(item);
+                            item.State = item.LastBidUserId != null ? AuctionState.Sold : AuctionState.Expired;
+                            item.ClosingDateTime = DateTime.Now;
+                            Log.Info("Auction " + item.Id + " " + item.State);
+                            UpdateAuction(item);
                         }
                         else
                         {
@@ -87,8 +94,9 @@ namespace RealtimeTestApp.Hubs
                     }
 
                     context.SaveChanges();
-                    Clients.All.newAuction(auction);
                 }
+
+                Clients.All.updateAuction(auction);
             }
 
         }
@@ -99,6 +107,11 @@ namespace RealtimeTestApp.Hubs
             {
                 var user = context.Users.Find(userId);
                 
+                if(user == null)
+                {
+                    return;
+                }
+
                 if (user.TokenStashSize <= 0)
                 {
                     return;
@@ -112,7 +125,7 @@ namespace RealtimeTestApp.Hubs
                         user.TokenStashSize--;
                         auction.LastBidUser = user;
                         auction.LastBidUserUserName = user.UserName;
-                        auction.Time += ExtendPeriod;
+                        auction.Time += auction.Time < 10 ? 10 : 0;
                         auction.StartingPrice++;
                         Bid bid = new Bid
                         {
@@ -125,38 +138,22 @@ namespace RealtimeTestApp.Hubs
                         context.Bids.Add(bid);
                         context.SaveChanges();
 
-                        Clients.All.extendAuction(auction, ExtendPeriod);
+                        UpdateAuction(auction);
+                        Log.Info("Auction " + auction.Id + " bidded by user " + user.Id);
+
                     }
 
                 }
             }
         }
 
-
-        public void OpenAuction(Auction auction)
-        {
-            Clients.All.OpenAuction(auction);
-        }
-
-        public void RemoveAuction(Auction auction)
-        {
-            using (var context = new ApplicationDbContext())
-            {
-                auction = context.Auctions.First(item => item.Id == auction.Id);
-                auction.State = auction.LastBidUserId != null ? AuctionState.Sold : AuctionState.Expired;
-                auction.ClosingDateTime = DateTime.Now;
-                context.SaveChanges();
-            }
-
-            Clients.All.removeAuction(auction);
-        }
-
         public IEnumerable<Auction> GetAllAuctions()
         {
             using (var context = new ApplicationDbContext())
             {
+
                 return
-                    context.Auctions.Where(item => item.State == AuctionState.Open).OrderBy(item => item.Time).ToList();
+                    context.Auctions.Where(item => item.State == AuctionState.Open && item.OpeningDateTime != null).OrderByDescending(item => item.OpeningDateTime).Take(5).ToList();
             }
         }
 
@@ -170,6 +167,11 @@ namespace RealtimeTestApp.Hubs
                         .Take(10)
                         .ToList();
             }
+        }
+
+        public void UpdateAuction(Auction auction)
+        {
+            Clients.All.updateAuction(auction);
         }
     }
 }

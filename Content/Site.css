@@ -66,3 +66,21 @@ td {
 .no-padding-left {
     padding-left: 0;
 }
+
+.panel-heading > a {
+    text-decoration: none;
+    color: white;
+}
+
+.navbar-header > a {
+    color: white;
+}
+
+.nav.navbar-nav > li > a{
+    color: white;
+}
+
+.button-padded {
+    margin-left: 2.5%;
+    margin-right: 2.5%;
+}

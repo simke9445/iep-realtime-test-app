@@ -16,17 +16,15 @@ namespace RealtimeTestApp.Controllers
         protected ApplicationDbContext ApplicationDbContext { get; set; }
         protected UserManager<ApplicationUser> UserManager { get; set; }
 
+        private static readonly log4net.ILog Log =
+            log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+
         public UserController()
         {
             ApplicationDbContext = new ApplicationDbContext();
             UserManager =
                 new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(ApplicationDbContext));
-        }
-
-        // GET: User
-        public ActionResult Index()
-        {
-            return View();
         }
 
         public ActionResult EditForm()
@@ -36,6 +34,12 @@ namespace RealtimeTestApp.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
+            return View(UserManager.FindById(User.Identity.GetUserId()));
+        }
+
+        public ActionResult Details()
+        {
+            
             return View(UserManager.FindById(User.Identity.GetUserId()));
         }
 
@@ -59,6 +63,8 @@ namespace RealtimeTestApp.Controllers
 
             ApplicationDbContext.SaveChanges();
 
+            Log.Info("Edited User " + user.Id);
+
             return RedirectToAction("Auctions", "Auction");
         }
 
@@ -79,23 +85,23 @@ namespace RealtimeTestApp.Controllers
             return View(viewModel);
         }
 
-        [HttpPost]
-        public ActionResult TokenOrder(Order order)
-        {
-            order.User = UserManager.FindById(User.Identity.GetUserId());
-            order.CreationDateTime = DateTime.Now;
-            order.State = OrderState.Confirmed;
-            order.PackagePrice = 10; // default
-            order.User.TokenStashSize += (int)order.TokenAmount;
+        //[HttpPost]
+        //public ActionResult TokenOrder(Order order)
+        //{
+        //    order.User = UserManager.FindById(User.Identity.GetUserId());
+        //    order.CreationDateTime = DateTime.Now;
+        //    order.State = OrderState.Confirmed;
+        //    order.PackagePrice = 10; // default
+        //    order.User.TokenStashSize += (int)order.TokenAmount;
 
-            ApplicationDbContext.Orders.Add(order);
-            ApplicationDbContext.SaveChanges();
+        //    ApplicationDbContext.Orders.Add(order);
+        //    ApplicationDbContext.SaveChanges();
 
-            return RedirectToAction("Auctions", "Auction");
-        }
+        //    return RedirectToAction("Auctions", "Auction");
+        //}
 
-       
-        public ActionResult TokenOrderConfirmation(string clientid, int amount, string status)
+
+        public ActionResult TokenOrderConfirmation(string clientid, int amount, string status, double enduserprice)
         {
             if (UserManager.FindById(clientid) == null)
             {
@@ -107,7 +113,7 @@ namespace RealtimeTestApp.Controllers
                 User = user,
                 TokenAmount = (TokenPackage)amount,
                 CreationDateTime = DateTime.Now,
-                PackagePrice = 10,
+                PackagePrice = (int)enduserprice,
                 State = status.Equals("success") ? OrderState.Confirmed : OrderState.Canceled
             };
 
@@ -117,17 +123,22 @@ namespace RealtimeTestApp.Controllers
             ApplicationDbContext.SaveChanges();
 
 
-            MailMessage mail = new MailMessage("auction@iep.com", user.Email);
+            MailMessage mail = new MailMessage("simke9445@gmail.com", user.Email);
             SmtpClient client = new SmtpClient
             {
                 Port = 25,
                 DeliveryMethod = SmtpDeliveryMethod.Network,
                 UseDefaultCredentials = false,
-                Host = "smtp.google.com"
+                Credentials = new NetworkCredential("simke9445@gmail.com", "cnhhbkfzrcutarvx"),
+                EnableSsl = true,
+                Host = "smtp.gmail.com"
             };
             mail.Subject = "[TokenOrder]";
             mail.Body = "Token Order " + order.State + " for token package " + order.TokenAmount;
             client.Send(mail);
+
+
+            Log.Info("Token Order[package = " + order.TokenAmount + "] for user "+ user.Id + order.State);
 
 
 

@@ -5,7 +5,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>New Auction Form</h2>
+<h2>Auction Form</h2>
 @using (Html.BeginForm("NewAuction", "Auction", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     @Html.AntiForgeryToken()

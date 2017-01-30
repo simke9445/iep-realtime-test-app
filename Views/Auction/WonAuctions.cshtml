@@ -4,21 +4,19 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>WonAuctions</h2>
+<h2>Won Auctions</h2>
 
-<div class="row-fluid">
+<div class="row">
     @foreach (var auction in Model)
     {
         <div class="col-md-3">
-            <div class="panel panel-default">
+            <div class="panel panel-primary">
                 <div class="panel-heading text-center">
                     @Html.ActionLink(auction.ProductName, "Auction", "Auction", new { id = auction.Id }, new { @class = "cool" })
                 </div>
                 <div class="panel-body text-center">
                     <img src=@auction.Image class="img-rounded img-responsive" />
-                    <p class="price"> @auction.StartingPrice </p>
-                    <p class="time"> @auction.Time </p>
-                    <p class="last-bid-user"> @auction.LastBidUserUserName </p>
+                    <p class="price"> $ @auction.StartingPrice</p>
                 </div>
             </div>
         </div>

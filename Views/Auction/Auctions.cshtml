@@ -1,61 +1,57 @@
 ﻿@using RealtimeTestApp.Models
-@model ApplicationUser
 
 @{
     ViewBag.Title = "Auctions";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
 <h2 class="text-center">Live Auctions Bidding</h2>
-<div id="auctionsTable" class="container">
-    <div class="row form-horizontal">
-        <div class="form-group">
-            <input type="text" class="form-control" style="display: initial !important;" placeholder="Search" name="srch-term" id="srch-term">
-            <button class="btn btn-default" type="submit" id="submitButton"><i class="glyphicon glyphicon-search"></i></button>
-        </div>
-        <div class="form-group form-horizontal">
-            <h4>Filter</h4>
-            <div class="form-group">
-                <div class="col-md-6">
-                    <div class="checkbox">
-                        <label class="control-label">
-                            <input type="checkbox" id="priceRange"> Price Range
-                        </label>
-                    </div>
-                </div>
-                <div class="col-md-6" hidden id="priceRangeDiv">
-                    <div class="col-md-6 no-padding-left">
-                        <label for="startPriceRange" class="control-label ">Start Price</label>
-                        <input type="number" id="startPriceRange" class="form-control" />
-                    </div>
-                    <div class="col-md-6">
-                        <label for="endPriceRange" class="control-label">End Price</label>
-                        <input type="number" id="endPriceRange" class="form-control" />
-                    </div>
-                </div>
-            </div>
-            <div class="form-group">
-                <div class="col-md-6">
-                    <div class="checkbox">
-                        <label class="control-label">
-                            <input type="checkbox" id="status"> Auction Status
-                        </label>
-                    </div>
-                </div>
-                <div class="col-md-6" hidden id="statusDiv">
-                    @Html.DropDownList("auctionStatus", EnumHelper.GetSelectList(typeof(AuctionState)), "Select Status", new { @class = "form-control" })
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="row auctionTable flex-row">
-    </div>
-    <div class="row text-center">
-        <ul id="gallery" class="pagination-sm pagination"></ul>
-    </div>
 
+
+<div class="row">
+    <div class="form-group">
+        <input type="text" class="form-control" style="display: initial !important;" placeholder="Search" name="srch-term" id="srch-term">
+        <button class="btn btn-default" type="submit" id="submitButton"><i class="glyphicon glyphicon-search"></i></button>
+    </div>
+    <div class="form-group form-horizontal">
+        <h4>Filter</h4>
+        <div class="form-group">
+            <div class="col-md-6">
+                <div class="checkbox">
+                    <label class="control-label">
+                        <input type="checkbox" id="priceRange"> Price Range
+                    </label>
+                </div>
+            </div>
+            <div class="col-md-6" hidden id="priceRangeDiv">
+                <div class="col-md-6 no-padding-left">
+                    <label for="startPriceRange" class="control-label ">Start Price</label>
+                    <input type="number" id="startPriceRange" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label for="endPriceRange" class="control-label">End Price</label>
+                    <input type="number" id="endPriceRange" class="form-control" />
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-6">
+                <div class="checkbox">
+                    <label class="control-label">
+                        <input type="checkbox" id="status"> Auction Status
+                    </label>
+                </div>
+            </div>
+            <div class="col-md-6" hidden id="statusDiv">
+                @Html.DropDownList("auctionStatus", EnumHelper.GetSelectList(typeof(AuctionState)), "Select Status", new { @class = "form-control" })
+            </div>
+        </div>
+    </div>
 </div>
-<div id="userTokenStashSize" hidden> @(Model?.TokenStashSize ?? 0) </div>
+<div class="row auctionTable flex-row" id="auctionTable">
+</div>
+<div class="row text-center">
+    <ul id="gallery" class="pagination-sm pagination"></ul>
+</div>
 
 
 @section Scripts {
@@ -120,51 +116,50 @@
                                     dom.find(".extend").hide();
                                 }
 
-                                if (loadedAuctions.length < 11) {
-                                    var lastBidUserName = dom.find(".last-bid-user"),
-                                        state = dom.find(".state");
-                                    if (lastBidUserName.text() === "{LastBidUserUserName}") {
-                                        lastBidUserName.text("No current bidder");
-                                    }
+                                var lastBidUserName = dom.find(".last-bid-user"),
+                                    state = dom.find(".state");
+                                if (lastBidUserName.text() === "{LastBidUserUserName}") {
+                                    lastBidUserName.text("No current bidder");
+                                }
 
-                                    switch (state.text()) {
-                                        case "0":
-                                            state.text("Draft");
-                                            break;
-                                        case "1":
-                                            state.text("Ready");
-                                            break;
-                                        case "2":
-                                            state.text("Open");
-                                            break;
-                                        case "3":
-                                            state.text("Sold");
-                                            break;
-                                        case "4":
-                                            state.text("Expired");
-                                            break;
-                                    }
+                                switch (state.text()) {
+                                    case "0":
+                                        state.text("Draft");
+                                        break;
+                                    case "1":
+                                        state.text("Ready");
+                                        break;
+                                    case "2":
+                                        state.text("Open");
+                                        break;
+                                    case "3":
+                                        state.text("Sold");
+                                        break;
+                                    case "4":
+                                        state.text("Expired");
+                                        break;
+                                }
 
-                                    var time = dom.find(".time");
-                                    var minutes = Math.floor(this.Time / 60),
-                                        seconds = this.Time % 60;
-                                    var finalTime = (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds);
-                                    time.text(finalTime);
+                                var time = dom.find(".time");
+                                var minutes = Math.floor(this.Time / 60),
+                                    seconds = this.Time % 60;
+                                var finalTime = (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds);
+                                time.text(finalTime);
 
-
+                                if (loadedAuctions.length < auctionsPerPage + 1) {
                                     $auctionsTableBody.append(dom);
                                 }
                             });
 
                             var defaultPaginationOptions = {
-                                totalPages: Math.max(Math.ceil(loadedAuctions.length / 10), 1),
-                                visiblePages: Math.min(Math.max(Math.ceil(loadedAuctions.length / 10), 1), 5),
+                                totalPages: Math.max(Math.ceil(loadedAuctions.length / auctionsPerPage), 1),
+                                visiblePages: Math.min(Math.max(Math.ceil(loadedAuctions.length / auctionsPerPage), 1), 5),
                                 onPageClick: function (event, page) {
                                     $auctionsTableBody.empty();
 
-                                    var startingIndexForPage = (page - 1) * 10;
+                                    var startingIndexForPage = (page - 1) * auctionsPerPage;
 
-                                    for (var i = startingIndexForPage; i < Math.min(loadedAuctions.length, page * 10) ; i++) {
+                                    for (var i = startingIndexForPage; i < Math.min(loadedAuctions.length, page * auctionsPerPage) ; i++) {
                                         $auctionsTableBody.append(loadedAuctions[i].dom);
                                     }
 

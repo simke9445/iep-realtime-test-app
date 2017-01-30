@@ -16,11 +16,6 @@ if (!String.prototype.supplant) {
 $(function() {
     $(document).on('click', '.extend',
         function () {
-            var userTokenStashSize = parseInt($("#userTokenStashSize").text());
-            if (userTokenStashSize <= 0 || isNaN(userTokenStashSize)) {
-                return;
-            }
-
             var auctionId = $(this).data("id");
 
             $.connection.auctionTicker.server.bid(auctionId);
@@ -28,15 +23,63 @@ $(function() {
         });
 });
 
-var ticker, rowTemplate, $auctionsTable = $("#auctionsTable"), $auctionsTableBody = $auctionsTable.find(".auctionTable");
+var ticker, rowTemplate, $auctionsTableBody = $("#auctionTable");
+
+
+var auctionsPerPage = 10;
+
+
+function updateAuctionDom(dom, auction) {
+    if (auction.lastBidUser != null) {
+        dom.find(".last-bid-user").html(auction.LastBidUser.UserName);
+    }
+    dom.find(".price").html("$" + auction.StartingPrice);
+
+    var state = dom.find(".state");
+
+    switch(auction.State) {
+        case 0:
+            state.text("Draft");
+            break;
+        case 1:
+            state.text("Ready");
+            break;
+        case 2:
+            state.text("Open");
+            break;
+        case 3:
+            state.text("Sold");
+            break;
+        case 4:
+            state.text("Expired");
+            break;
+    }
+
+    var bidDom = dom.find(".extend");
+
+    if (auction.State === 2) {
+        bidDom.show();
+    } else {
+        bidDom.hide();
+    }
+
+    
+
+    dom.find(".product").html(auction.ProductName);
+
+    var minutes = Math.floor(auction.Time / 60),
+        seconds = auction.Time % 60;
+    var finalTime = (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds);
+    dom.find(".time").text(finalTime);
+}
 
 
 $(function() {
     
     ticker = $.connection.auctionTicker;
     rowTemplate = '<div class="col-md-3"> ' +
-                    '<div class="panel panel-default panel-auction" data-id={Id}>' +
-                        '<div class="panel-heading text-center"> <a href="Auction/{Id}"> {ProductName} </a> </div>' +
+                    '<div class="panel panel-primary panel-auction" data-id={Id}>' +
+                        '<div class="panel-heading text-center"> <a class="product" href="Auction/{Id}"> {ProductName} </a> </div>' +
                         '<div class="panel-body text-center">' +
                             '<img src={Image} class="img-rounded auction-img" />' +
                             '<table class="table">' +
@@ -53,7 +96,7 @@ $(function() {
                                     '<p class="state">{State}</p> ' +
                                 '</td></tr>' +
                                 '<tr><td class="text-center">' +
-                                    '<div class="btn btn-primary extend" data-id={Id}>Extend</div>' +
+                                    '<div class="btn btn-primary extend" data-id={Id}>Bid Now</div>' +
                                 '</td></tr>' +
                             '</table>' +
                         '</div>' +
@@ -70,49 +113,51 @@ $(function() {
                     'auction': this,
                     'dom': dom
                 });
-                if (loadedAuctions.length < 11) {
-                    var lastBidUserName = dom.find(".last-bid-user"),
+
+                var lastBidUserName = dom.find(".last-bid-user"),
                         state = dom.find(".state"),
                         time = dom.find(".time");
-                    if (lastBidUserName.text() === "{LastBidUserUserName}") {
-                        lastBidUserName.text("No current bidder");
-                    }
+                if (lastBidUserName.text() === "{LastBidUserUserName}") {
+                    lastBidUserName.text("No current bidder");
+                }
 
-                    switch(state.text()) {
-                        case "0":
-                            state.text("Draft");
-                            break;
-                        case "1":
-                            state.text("Ready");
-                            break;
-                        case "2":
-                            state.text("Open");
-                            break;
-                        case "3":
-                            state.text("Sold");
-                            break;
-                        case "4":
-                            state.text("Expired");
-                            break;
-                    }
+                switch (state.text()) {
+                    case "0":
+                        state.text("Draft");
+                        break;
+                    case "1":
+                        state.text("Ready");
+                        break;
+                    case "2":
+                        state.text("Open");
+                        break;
+                    case "3":
+                        state.text("Sold");
+                        break;
+                    case "4":
+                        state.text("Expired");
+                        break;
+                }
 
-                    var minutes = Math.floor(this.Time / 60),
-                        seconds = this.Time % 60;
+                var minutes = Math.floor(this.Time / 60),
+                    seconds = this.Time % 60;
 
-                    var finalTime = (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds);
-                    time.text(finalTime);
+                var finalTime = (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds);
+                time.text(finalTime);
+
+                if (loadedAuctions.length < auctionsPerPage + 1) {
 
                     $auctionsTableBody.append(dom);
                 }
             });
 
             var defaultPaginationOptions = {
-                totalPages: Math.max(Math.ceil(loadedAuctions.length / 10), 1),
-                visiblePages: Math.min(Math.max(Math.ceil(loadedAuctions.length / 10), 1), 5),
+                totalPages: Math.max(Math.ceil(loadedAuctions.length / auctionsPerPage), 1),
+                visiblePages: Math.min(Math.max(Math.ceil(loadedAuctions.length / auctionsPerPage), 1), 5),
                 onPageClick: function (event, page) {
                     $auctionsTableBody.empty();
 
-                    var startingIndexForPage = (page - 1) * 10;
+                    var startingIndexForPage = (page - 1) * auctionsPerPage;
 
                     for (var i = startingIndexForPage; i < loadedAuctions.length; i++) {
                         $auctionsTableBody.append(loadedAuctions[i].dom);
@@ -127,6 +172,7 @@ $(function() {
     }
 
    
+
     ticker.client.tick = function() {
         $.each(loadedAuctions,
             function () {
@@ -141,66 +187,18 @@ $(function() {
             });
     };
 
-    ticker.client.newAuction = function (auction) {
-        var dom = $($.parseHTML(rowTemplate.supplant(auction)));
-        loadedAuctions.push({
-            'auction': auction,
-            'dom': dom
-        });
-        $auctionsTableBody.append(dom);
-    };
 
-    ticker.client.extendAuction = function (extendedAuction, extendPeriod) {
+    ticker.client.updateAuction = function(updatedAuction) {
         var currentAuction = loadedAuctions.find(function(auction) {
-            return auction.auction.Id === extendedAuction.Id;
+            return auction.auction.Id === updatedAuction.Id;
         });
 
         if (currentAuction != null) {
-            currentAuction.auction = extendedAuction;
-            currentAuction.dom.find(".last-bid-user").html(currentAuction.auction.LastBidUser.UserName);
-            currentAuction.dom.find(".price").html("$" + currentAuction.auction.StartingPrice);
-
-            var minutes = Math.floor(currentAuction.auction.Time / 60),
-                seconds = currentAuction.auction.Time % 60;
-            var finalTime = (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds);
-            console.log(finalTime);
-            currentAuction.dom.find(".time").text(finalTime);
-
-
-        }
-    };
-
-    ticker.client.removeAuction = function(removedAuction) {
-        var currentAuction = loadedAuctions.find(function (auction) {
-            return auction.auction.Id === removedAuction.Id;
-        });
-
-        if (currentAuction != null) {
-            console.log("Removed auction with name " + currentAuction.auction.ProductName);
-            currentAuction.dom.remove();
-            var index = loadedAuctions.map(function (e) { return e.auction.Id; }).indexOf(currentAuction.Id);
-            if (index !== -1) {
-                console.log("Removed at index " + index);
-                loadedAuctions.splice(index, 1);
-            }
+            currentAuction.auction = updatedAuction;
+            updateAuctionDom(currentAuction.dom, currentAuction.auction);
         }
     }
 
-
-    ticker.client.openAuction = function(openedAuction) {
-        
-        var currentAuction = loadedAuctions.find(function (auction) {
-            return auction.auction.Id === openedAuction.Id;
-        });
-
-        if (currentAuction != null) {
-            currentAuction.auction = openedAuction;
-            currentAuction.dom.find(".state").text("Open");
-            currentAuction.dom.find(".extend").show();
-        }
-    }
-
-
-    // Start the connection
-    $.connection.hub.start().done(init);
-});
+        // Start the connection
+        $.connection.hub.start().done(init);
+    });

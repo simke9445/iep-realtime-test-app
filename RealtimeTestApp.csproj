@@ -191,13 +191,9 @@
     </Compile>
     <Compile Include="Hubs\AuctionTicker.cs" />
     <Compile Include="Hubs\AuctionHub.cs" />
-    <Compile Include="Migrations\201701280004228_InitialMigration.cs" />
-    <Compile Include="Migrations\201701280004228_InitialMigration.Designer.cs">
-      <DependentUpon>201701280004228_InitialMigration.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201701280040286_NullableIdAuction.cs" />
-    <Compile Include="Migrations\201701280040286_NullableIdAuction.Designer.cs">
-      <DependentUpon>201701280040286_NullableIdAuction.cs</DependentUpon>
+    <Compile Include="Migrations\201701300955193_InitialMigration.cs" />
+    <Compile Include="Migrations\201701300955193_InitialMigration.Designer.cs">
+      <DependentUpon>201701300955193_InitialMigration.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -302,6 +298,7 @@
     <Content Include="Views\Auction\Auction.cshtml" />
     <Content Include="Views\User\EditForm.cshtml" />
     <Content Include="Views\Auction\WonAuctions.cshtml" />
+    <Content Include="Views\User\Details.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -315,11 +312,8 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201701280004228_InitialMigration.resx">
-      <DependentUpon>201701280004228_InitialMigration.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201701280040286_NullableIdAuction.resx">
-      <DependentUpon>201701280040286_NullableIdAuction.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201701300955193_InitialMigration.resx">
+      <DependentUpon>201701300955193_InitialMigration.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

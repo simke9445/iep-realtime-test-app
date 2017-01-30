@@ -21,17 +21,14 @@ namespace RealtimeTestApp.Controllers
         protected ApplicationDbContext ApplicationDbContext { get; set; }
         protected UserManager<ApplicationUser> UserManager { get; set; }
 
+        private static readonly log4net.ILog Log =
+            log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         public AuctionController()
         {
             ApplicationDbContext = new ApplicationDbContext();
             UserManager =
                 System.Web.HttpContext.Current.GetOwinContext().GetUserManager<ApplicationUserManager>();
-        }
-
-        // GET: Auction
-        public ActionResult Index()
-        {
-            return View();
         }
 
         public ActionResult Auction(long? id)
@@ -43,7 +40,7 @@ namespace RealtimeTestApp.Controllers
 
         public ActionResult Auctions()
         {
-            return View(UserManager.FindById(User.Identity.GetUserId()));
+            return View();
         }
 
         public ActionResult WonAuctions()
@@ -64,6 +61,12 @@ namespace RealtimeTestApp.Controllers
         [HttpPost]
         public ActionResult NewAuction(Auction auction, HttpPostedFileBase file)
         {
+            if (!User.Identity.IsAuthenticated || !User.IsInRole("Admin"))
+            {
+                return new HttpUnauthorizedResult("You need admin privileges for this action.");
+            }
+
+
             ModelState.Remove("Id");
             if (file == null || file.ContentLength == 0)
             {
@@ -99,7 +102,9 @@ namespace RealtimeTestApp.Controllers
 
             AuctionTicker.Instance.AddNewAuction(auction);
 
-            return RedirectToAction("Auctions", "Auction", auction);
+            Log.Info("Auction " + (auction.Id == 0 ? "Created" : auction.Id + " Edited"));
+
+            return RedirectToAction("Auctions", "Auction");
         }
 
         public ActionResult NewAuctionForm()
@@ -113,10 +118,10 @@ namespace RealtimeTestApp.Controllers
         {
             var queryStrategy = new CompositeQueryStrategy();
 
-            if (statusQuery)
+            if (statusQuery && auctionStatus.HasValue)
                 queryStrategy.AddQueryStrategy(new StatusQueryStrategy(auctionStatus.Value));
             queryStrategy.AddQueryStrategy(new ProductNameQueryStrategy(searchQuery));
-            if (priceQuery)
+            if (priceQuery && startingPrice.HasValue && endingPrice.HasValue)
                 queryStrategy.AddQueryStrategy(new PriceRangeQueryStrategy(startingPrice.Value, endingPrice.Value));
 
             return Json(queryStrategy.Query(ApplicationDbContext.Auctions));
@@ -124,11 +129,19 @@ namespace RealtimeTestApp.Controllers
 
         public ActionResult Delete(long id)
         {
+            if (!User.Identity.IsAuthenticated || !User.IsInRole("Admin"))
+            {
+                return new HttpUnauthorizedResult("You need admin privileges for this action.");
+            }
+
             var auction = ApplicationDbContext.Auctions.First(item => item.Id == id);
             auction.State = AuctionState.Draft;
             auction.ClosingDateTime = DateTime.Now;
 
             ApplicationDbContext.SaveChanges();
+
+            AuctionTicker.Instance.UpdateAuction(auction);
+            Log.Info("Auction " + auction.Id + " Deleted");
 
             return RedirectToAction("Auctions");
         }
@@ -142,13 +155,21 @@ namespace RealtimeTestApp.Controllers
 
         public ActionResult Open(long id)
         {
+            if (!User.Identity.IsAuthenticated || !User.IsInRole("Admin"))
+            {
+                return new HttpUnauthorizedResult("You need admin privileges for this action.");
+            }
+
             var auction = ApplicationDbContext.Auctions.First(item => item.Id == id);
             auction.State = AuctionState.Open;
             auction.OpeningDateTime = DateTime.Now;
 
             ApplicationDbContext.SaveChanges();
 
-            AuctionTicker.Instance.OpenAuction(auction);
+            AuctionTicker.Instance.UpdateAuction(auction);
+
+            Log.Info("Auction " + auction.Id + " Opened");
+
 
             return RedirectToAction("Auction", new {id = id});
         }

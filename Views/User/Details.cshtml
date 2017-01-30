@@ -1,0 +1,35 @@
+﻿@model RealtimeTestApp.Models.ApplicationUser
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <h2>Details</h2>
+    
+    <div class="col-md-6">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <table class="table">
+                    <tr>
+                        <td>@Html.LabelFor(m => m.FirstName)</td>
+                        <td>@Html.DisplayFor(m => m.FirstName)</td>
+                    </tr>
+                    <tr>
+                        <td>@Html.LabelFor(m => m.LastName)</td>
+                        <td>@Html.DisplayFor(m => m.LastName)</td>
+                    </tr>
+                    <tr>
+                        <td><label>Token Stash Size</label></td>
+                        <td>@Html.DisplayFor(m => m.TokenStashSize)</td>
+                    </tr>
+                    <tr>
+                        <td>@Html.ActionLink("Edit", "EditForm", "User")</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>    
+
+</div>
+

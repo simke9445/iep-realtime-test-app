@@ -5,27 +5,43 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Auction</h2>
+
 <div class="row">
+    <h2>Auction Details</h2>
     <div class="col-md-6">
-        <div class="panel panel-default">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <a class="text-left">@Html.DisplayFor(m => m.ProductName)</a>    
+            </div>
             <div class="panel-body">
-                Product Name: <p id="productName">@Html.DisplayFor(m => m.ProductName)</p>
-                Remaining Time: <p id="time">@Html.DisplayFor(m => m.Time)</p>
-                Starting Price: <p id="startingPrice">@Html.DisplayFor(m => m.StartingPrice)</p>
-                Status: <p id="status">@Html.DisplayFor(m => m.State)</p>
-                @if (User.Identity.IsAuthenticated && User.IsInRole("Admin") && Model.State == AuctionState.Ready)
-                {
-                    @Html.ActionLink("Delete", "Delete", "Auction", new { id = Model.Id }, new { @class = "btn btn-primary" })
-                    @Html.ActionLink("Edit", "EditForm", "Auction", new { id = Model.Id }, new { @class = "btn btn-primary" })
-                    @Html.ActionLink("Open", "Open", "Auction", new { id = Model.Id }, new { @class = "btn btn-primary" })
-                }
+                <div class="col-md-6">
+                    <img src=@Model.Image class="img-rounded auction-img"/>
+                    <br/>
+                    <br/>
+                    Remaining Time:
+                    <p id="time">@Html.DisplayFor(m => m.Time)</p>
+                    Starting Price:
+                    <p id="startingPrice">@Html.DisplayFor(m => m.StartingPrice)</p>
+                    Status:
+                    <p id="state">@Html.DisplayFor(m => m.State)</p>
+                    @if (User.Identity.IsAuthenticated && User.IsInRole("Admin") && Model.State == AuctionState.Ready)
+                    {
+                        @Html.ActionLink("Delete", "Delete", "Auction", new {id = Model.Id}, new {@class = "btn btn-primary button-padded"})
+                        @Html.ActionLink("Edit", "EditForm", "Auction", new {id = Model.Id}, new {@class = "btn btn-primary button-padded" })
+                        @Html.ActionLink("Open", "Open", "Auction", new {id = Model.Id}, new {@class = "btn btn-primary button-padded" })
+                    }
+                </div>
+                <div class="col-md-6">
+                    <h4 class="text-center"> Latest Bids </h4>
+                    <div id="bids" class="text-center">
+
+                    </div>
+                </div>
 
             </div>
         </div>
     </div>
-    <div class="col-md-6" id="bids">
-    </div>
+
     <div id="auctionId" hidden>@Model.Id</div>
 </div>
 
@@ -39,9 +55,9 @@
 
         // A simple templating method for replacing placeholders enclosed in curly braces.
         if (!String.prototype.supplant) {
-            String.prototype.supplant = function (o) {
+            String.prototype.supplant = function(o) {
                 return this.replace(/{([^{}]*)}/g,
-                    function (a, b) {
+                    function(a, b) {
                         var r = o[b];
                         return typeof r === 'string' || typeof r === 'number' ? r : a;
                     }
@@ -50,65 +66,87 @@
         }
 
 
-        var ticker, rowTemplate, $bidsBody = $("#bids");
+        var ticker, rowTemplate, $bidsBody = $("#bids"), bidsPerAuction = 10;
 
-        $(function () {
+        $(function() {
 
             ticker = $.connection.auctionTicker;
             rowTemplate = '<p> {UserName} </p>';
 
             function init() {
-                console.log("Init Called");
                 var id = $("#auctionId").text();
-                ticker.server.getAllBids(id).done(function (bids) {
-                    console.log(bids);
-                    $bidsBody.empty();
-                    $.each(bids,
-                        function () {
-                            var dom = $($.parseHTML(rowTemplate.supplant(this)));
-                            loadedBids.push({
-                                'bid': this,
-                                'dom': dom
+                ticker.server.getAllBids(id)
+                    .done(function(bids) {
+                        console.log(bids);
+                        $bidsBody.empty();
+                        $.each(bids,
+                            function() {
+                                var dom = $($.parseHTML(rowTemplate.supplant(this)));
+                                loadedBids.push({
+                                    'bid': this,
+                                    'dom': dom
+                                });
+                                $bidsBody.append(dom);
                             });
-                            $bidsBody.append(dom);
-                        });
-                });
+                    });
 
             }
 
 
-            ticker.client.tick = function () {
+            ticker.client.tick = function() {
                 var time = parseInt($("#time").text());
-                if (time <= 0 && $("#status").text() === "Open") {
-                    if (loadedBids.length > 0) {
-                        $("#status").text("Sold");
-                    } else {
-                        $("#status").text("Expired");
-                    }
-                    return;
-                }
-                if ($("#status").text() === "Open") {
+
+                if ($("#state").text() === "Open") {
                     $("#time").text(time - 1);
                 }
 
             };
 
-            ticker.client.extendAuction = function (auction, extendPeriod) {
-                if (auction.Id === parseInt($("#auctionId").text())) {
-                    var dom = $($.parseHTML(rowTemplate.supplant(auction.LastBidUser)));
-                    loadedBids.push({
-                        'bid': null,
-                        'dom': dom
-                    });
+            ticker.client.updateAuction = function (updatedAuction) {
+                console.log(updatedAuction);
+                console.log(parseInt($("#auctionId").text()));
+                if (updatedAuction.Id === parseInt($("#auctionId").text())) {
 
-                    if (loadedBids.length > 10) {
-                        loadedBids.shift().dom.remove();
+                    var currentStartingPrice = parseInt($("#startingPrice").text());
+                    if (currentStartingPrice < updatedAuction.StartingPrice) {
+                        var dom = $($.parseHTML(rowTemplate.supplant(updatedAuction.LastBidUser)));
+                        loadedBids.push({
+                            'bid': null,
+                            'dom': dom
+                        });
+
+                        if (loadedBids.length > bidsPerAuction) {
+                            loadedBids.shift().dom.remove();
+                        }
+                        $bidsBody.append(dom);
                     }
-                    $("#time").text(parseInt($("#time").text()) + extendPeriod);
-                    $bidsBody.append(dom);
+
+
+                    $("#time").text(updatedAuction.Time);
+                    $("#productName").text(updatedAuction.ProductName);
+
+                    var state = $("#state");
+                    switch (updatedAuction.State) {
+                        case 0:
+                            state.text("Draft");
+                            break;
+                        case 1:
+                            state.text("Ready");
+                            break;
+                        case 2:
+                            state.text("Open");
+                            break;
+                        case 3:
+                            state.text("Sold");
+                            break;
+                        case 4:
+                            state.text("Expired");
+                            break;
+                    }
+
+                    $("#startingPrice").text(updatedAuction.StartingPrice);
                 }
             }
-
 
             // Start the connection
             $.connection.hub.start().done(init);

@@ -31,3 +31,56 @@ textarea {
     background-repeat:   no-repeat !important;
     background-size:     cover !important;
 }
+
+
+
+.panel {
+  flex:1 0 95%;
+}
+
+@media only screen and (min-width : 481px) {
+    .flex-row {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    .flex-row > [class*='col-'] {
+        display: flex;
+        flex-direction: column;
+    }
+    .flex-row.row:after, 
+    .flex-row.row:before {
+        display: flex;
+    }
+}
+
+table { 
+    border-collapse: collapse;
+    border: none;
+}
+
+td {
+    border: none !important;
+
+}
+
+.no-padding-left {
+    padding-left: 0;
+}
+
+.panel-heading > a {
+    text-decoration: none;
+    color: white;
+}
+
+.navbar-header > a {
+    color: white;
+}
+
+.nav.navbar-nav > li > a{
+    color: white;
+}
+
+.button-padded {
+    margin-left: 2.5%;
+    margin-right: 2.5%;
+}
